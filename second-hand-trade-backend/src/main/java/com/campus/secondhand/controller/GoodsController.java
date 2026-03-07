@@ -5,7 +5,6 @@ import com.campus.secondhand.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
@@ -41,8 +40,8 @@ public class GoodsController {
     }
 
     @PostMapping("/add")
-    public Goods add(@RequestBody Goods goods, HttpSession session) {
-        goods.setUserId(((com.campus.secondhand.model.User) session.getAttribute("user")).getId());
+    public Goods add(@RequestBody Goods goods, @RequestHeader("X-User-Id") Integer userId) {
+        goods.setUserId(userId);
         goods.setStatus("active");
         goodsService.save(goods);
         return goods;

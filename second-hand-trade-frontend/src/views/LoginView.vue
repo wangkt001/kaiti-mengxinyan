@@ -71,6 +71,8 @@ const login = async () => {
           );
           if (res) {
             userStore.setUser(res);
+            // 存储用户信息到localStorage
+            localStorage.setItem("user", JSON.stringify(res));
             ElMessage.success("登录成功");
             router.push("/");
           } else {

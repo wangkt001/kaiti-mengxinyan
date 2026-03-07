@@ -18,8 +18,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public User login(String username, String password) {
         User user = userDao.getByUsername(username);
-        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
-            return user;
+        if (user != null) {
+            // 检查密码是否是明文（用于初始化的管理员账号）
+            if (user.getPassword().equals(password)) {
+                // 如果是明文密码，更新为加密密码
+                user.setPassword(passwordEncoder.encode(password));
+                userDao.update(user);
+                return user;
+            } else if (passwordEncoder.matches(password, user.getPassword())) {
+                // 正常的加密密码验证
+                return user;
+            }
         }
         return null;
     }
@@ -39,6 +48,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByIdNumber(String idNumber) {
         return userDao.getByIdNumber(idNumber);
+    }
+
+    @Override
+    public User getById(Integer id) {
+        return userDao.getById(id);
     }
 
     @Override

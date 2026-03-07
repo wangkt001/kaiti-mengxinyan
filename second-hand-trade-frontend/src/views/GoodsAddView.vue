@@ -105,6 +105,7 @@ import { ElMessage } from "element-plus";
 import { Plus, ZoomIn, Delete } from "@element-plus/icons-vue";
 import { goodsApi } from "../api/modules/goods";
 import { categoryApi } from "../api/modules/category";
+import { goodsImageApi } from "../api/modules/goodsImage";
 import { useUserStore } from "../store";
 
 const router = useRouter();
@@ -122,11 +123,11 @@ const goodsRules = ref({
   categoryId: [{ required: true, message: "请选择商品分类", trigger: "blur" }],
   price: [
     { required: true, message: "请输入商品价格", trigger: "blur" },
-    { type: "number", message: "请输入正确的价格", trigger: "blur" },
+    { pattern: /^\d+(\.\d+)?$/, message: "请输入正确的价格", trigger: "blur" },
   ],
   stock: [
     { required: true, message: "请输入库存数量", trigger: "blur" },
-    { type: "number", message: "请输入正确的库存数量", trigger: "blur" },
+    { pattern: /^\d+$/, message: "请输入正确的库存数量", trigger: "blur" },
   ],
   description: [{ required: true, message: "请输入商品描述", trigger: "blur" }],
 });
@@ -165,6 +166,14 @@ const submitForm = async () => {
           const res = await goodsApi.add(goodsForm.value);
           if (res) {
             // 上传图片逻辑
+            if (imageList.value.length > 0) {
+              for (const file of imageList.value) {
+                await goodsImageApi.add({
+                  goodsId: res.id,
+                  imagePath: file.url,
+                });
+              }
+            }
             ElMessage.success("商品发布成功");
             router.push("/");
           } else {
@@ -190,7 +199,18 @@ onMounted(async () => {
   // 获取分类列表
   try {
     const res = await categoryApi.list();
-    categories.value = res;
+    // 去重处理
+    const uniqueCategories = [];
+    const categoryNames = new Set();
+
+    res.forEach((category) => {
+      if (!categoryNames.has(category.name)) {
+        categoryNames.add(category.name);
+        uniqueCategories.push(category);
+      }
+    });
+
+    categories.value = uniqueCategories;
   } catch (error) {
     console.error("获取分类失败:", error);
   }

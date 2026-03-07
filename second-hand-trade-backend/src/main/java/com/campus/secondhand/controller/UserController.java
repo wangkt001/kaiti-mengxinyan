@@ -5,8 +5,6 @@ import com.campus.secondhand.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpSession;
-
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -26,13 +24,10 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public User login(@RequestParam String username, @RequestParam String password, HttpSession session) {
+    public User login(@RequestBody User user) {
         try {
-            User user = userService.login(username, password);
-            if (user != null) {
-                session.setAttribute("user", user);
-            }
-            return user;
+            User loggedInUser = userService.login(user.getUsername(), user.getPassword());
+            return loggedInUser;
         } catch (Exception e) {
             System.out.println("Error in login: " + e.getMessage());
             e.printStackTrace();
@@ -41,21 +36,16 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public void logout(HttpSession session) {
-        try {
-            session.invalidate();
-        } catch (Exception e) {
-            System.out.println("Error in logout: " + e.getMessage());
-            e.printStackTrace();
-        }
+    public void logout() {
+        // 前端处理注销逻辑
     }
 
     @GetMapping("/info")
-    public Object getInfo(HttpSession session) {
+    public Object getInfo(@RequestHeader("X-User-Id") Integer userId) {
         try {
-            User user = (User) session.getAttribute("user");
+            User user = userService.getById(userId);
             if (user == null) {
-                return "User not logged in";
+                return "User not found";
             }
             return user;
         } catch (Exception e) {
@@ -66,15 +56,11 @@ public class UserController {
     }
 
     @PutMapping("/update")
-    public User update(@RequestBody User user, HttpSession session) {
+    public User update(@RequestBody User user, @RequestHeader("X-User-Id") Integer userId) {
         try {
-            User currentUser = (User) session.getAttribute("user");
-            if (currentUser != null) {
-                user.setId(currentUser.getId());
-                userService.updateById(user);
-                return user;
-            }
-            return null;
+            user.setId(userId);
+            userService.updateById(user);
+            return user;
         } catch (Exception e) {
             System.out.println("Error in update: " + e.getMessage());
             e.printStackTrace();

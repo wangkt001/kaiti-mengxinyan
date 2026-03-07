@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS goods (
     name VARCHAR(100) NOT NULL,
     description TEXT,
     price DECIMAL(10, 2) NOT NULL,
+    stock INT DEFAULT 1,
     category_id INT,
     user_id INT,
     status VARCHAR(20) DEFAULT 'active',
@@ -96,3 +97,10 @@ INSERT INTO categories (name, parent_id) VALUES
 ('图书文具', 0),
 ('运动户外', 0),
 ('其他', 0);
+
+-- 删除现有的管理员账号
+DELETE FROM users WHERE username = 'admin';
+
+-- 插入管理员账号（使用已加密的密码）
+INSERT INTO users (username, password, real_name, id_number, phone, email, role, avatar)
+VALUES ('admin', '$2a$10$nTJ3W6UNPStBDsarsI9ZbeQKKZvc8YKQwMKt3k65ndrCYL.qcV4d2', '管理员', '123456789012345678', '13800138000', 'admin@example.com', 'admin', NULL);

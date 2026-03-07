@@ -5,7 +5,6 @@ import com.campus.secondhand.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
@@ -16,14 +15,12 @@ public class OrderController {
     private OrderService orderService;
 
     @GetMapping("/buyer")
-    public List<Order> listByBuyer(HttpSession session) {
-        Integer userId = ((com.campus.secondhand.model.User) session.getAttribute("user")).getId();
+    public List<Order> listByBuyer(@RequestHeader("X-User-Id") Integer userId) {
         return orderService.findByBuyerId(userId);
     }
 
     @GetMapping("/seller")
-    public List<Order> listBySeller(HttpSession session) {
-        Integer userId = ((com.campus.secondhand.model.User) session.getAttribute("user")).getId();
+    public List<Order> listBySeller(@RequestHeader("X-User-Id") Integer userId) {
         return orderService.findBySellerId(userId);
     }
 
@@ -33,8 +30,8 @@ public class OrderController {
     }
 
     @PostMapping("/create")
-    public Order create(@RequestBody Order order, HttpSession session) {
-        order.setBuyerId(((com.campus.secondhand.model.User) session.getAttribute("user")).getId());
+    public Order create(@RequestBody Order order, @RequestHeader("X-User-Id") Integer userId) {
+        order.setBuyerId(userId);
         return orderService.createOrder(order);
     }
 
