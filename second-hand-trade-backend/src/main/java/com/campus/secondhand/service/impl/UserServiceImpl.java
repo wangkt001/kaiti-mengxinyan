@@ -1,23 +1,23 @@
 package com.campus.secondhand.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.campus.secondhand.dao.UserDao;
 import com.campus.secondhand.model.User;
 import com.campus.secondhand.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserService {
+public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private UserDao userDao;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public User login(String username, String password) {
-        QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.eq("username", username);
-        User user = baseMapper.selectOne(wrapper);
+        User user = userDao.getByUsername(username);
         if (user != null && passwordEncoder.matches(password, user.getPassword())) {
             return user;
         }
@@ -27,21 +27,25 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public User register(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        baseMapper.insert(user);
+        userDao.insert(user);
         return user;
     }
 
     @Override
     public User findByUsername(String username) {
-        QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.eq("username", username);
-        return baseMapper.selectOne(wrapper);
+        return userDao.getByUsername(username);
     }
 
     @Override
     public User findByIdNumber(String idNumber) {
-        QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.eq("id_number", idNumber);
-        return baseMapper.selectOne(wrapper);
+        return userDao.getByIdNumber(idNumber);
+    }
+
+    @Override
+    public void updateById(User user) {
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        userDao.update(user);
     }
 }

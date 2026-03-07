@@ -1,44 +1,44 @@
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
-export const useUserStore = defineStore('user', {
+export const useUserStore = defineStore("user", {
   state: () => ({
     user: null,
-    isLoggedIn: false
+    isLoggedIn: false,
   }),
   actions: {
     setUser(user) {
-      this.user = user
-      this.isLoggedIn = true
+      this.user = user;
+      this.isLoggedIn = true;
     },
     logout() {
-      this.user = null
-      this.isLoggedIn = false
-    }
-  }
-})
+      this.user = null;
+      this.isLoggedIn = false;
+    },
+  },
+});
 
-export const useGoodsStore = defineStore('goods', {
+export const useGoodsStore = defineStore("goods", {
   state: () => ({
     goodsList: [],
-    currentGoods: null
+    currentGoods: null,
   }),
   actions: {
     setGoodsList(goods) {
-      this.goodsList = goods
+      this.goodsList = goods;
     },
     setCurrentGoods(goods) {
-      this.currentGoods = goods
-    }
-  }
-})
+      this.currentGoods = goods;
+    },
+  },
+});
 
-export const useOrderStore = defineStore('order', {
+export const useOrderStore = defineStore("order", {
   state: () => ({
-    orderList: []
+    orderList: [],
   }),
   actions: {
     setOrderList(orders) {
-      this.orderList = orders
-    }
-  }
-})
+      this.orderList = orders;
+    },
+  },
+});

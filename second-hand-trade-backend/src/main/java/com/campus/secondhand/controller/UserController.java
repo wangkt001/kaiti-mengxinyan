@@ -5,7 +5,7 @@ import com.campus.secondhand.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/user")
@@ -16,36 +16,69 @@ public class UserController {
 
     @PostMapping("/register")
     public User register(@RequestBody User user) {
-        return userService.register(user);
+        try {
+            return userService.register(user);
+        } catch (Exception e) {
+            System.out.println("Error in register: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @PostMapping("/login")
     public User login(@RequestParam String username, @RequestParam String password, HttpSession session) {
-        User user = userService.login(username, password);
-        if (user != null) {
-            session.setAttribute("user", user);
+        try {
+            User user = userService.login(username, password);
+            if (user != null) {
+                session.setAttribute("user", user);
+            }
+            return user;
+        } catch (Exception e) {
+            System.out.println("Error in login: " + e.getMessage());
+            e.printStackTrace();
+            return null;
         }
-        return user;
     }
 
     @PostMapping("/logout")
     public void logout(HttpSession session) {
-        session.invalidate();
+        try {
+            session.invalidate();
+        } catch (Exception e) {
+            System.out.println("Error in logout: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @GetMapping("/info")
-    public User getInfo(HttpSession session) {
-        return (User) session.getAttribute("user");
+    public Object getInfo(HttpSession session) {
+        try {
+            User user = (User) session.getAttribute("user");
+            if (user == null) {
+                return "User not logged in";
+            }
+            return user;
+        } catch (Exception e) {
+            System.out.println("Error in getInfo: " + e.getMessage());
+            e.printStackTrace();
+            return "Error: " + e.getMessage();
+        }
     }
 
     @PutMapping("/update")
     public User update(@RequestBody User user, HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
-        if (currentUser != null) {
-            user.setId(currentUser.getId());
-            userService.updateById(user);
-            return user;
+        try {
+            User currentUser = (User) session.getAttribute("user");
+            if (currentUser != null) {
+                user.setId(currentUser.getId());
+                userService.updateById(user);
+                return user;
+            }
+            return null;
+        } catch (Exception e) {
+            System.out.println("Error in update: " + e.getMessage());
+            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 }

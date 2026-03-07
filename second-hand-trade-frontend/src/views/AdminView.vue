@@ -14,13 +14,26 @@
                 <div class="user-info">
                   <h4>{{ user.username }}</h4>
                   <p>真实姓名: {{ user.realName }}</p>
-                  <p>角色: {{ user.role === 'student' ? '学生' : user.role === 'teacher' ? '教师' : '管理员' }}</p>
+                  <p>
+                    角色:
+                    {{
+                      user.role === "student"
+                        ? "学生"
+                        : user.role === "teacher"
+                        ? "教师"
+                        : "管理员"
+                    }}
+                  </p>
                   <p>学号/工号: {{ user.idNumber }}</p>
                   <p>邮箱: {{ user.email }}</p>
                   <p>手机号: {{ user.phone }}</p>
                   <div class="user-actions">
-                    <el-button type="primary" @click="editUser(user.id)">编辑</el-button>
-                    <el-button type="danger" @click="deleteUser(user.id)">删除</el-button>
+                    <el-button type="primary" @click="editUser(user.id)"
+                      >编辑</el-button
+                    >
+                    <el-button type="danger" @click="deleteUser(user.id)"
+                      >删除</el-button
+                    >
                   </div>
                 </div>
               </el-card>
@@ -28,15 +41,35 @@
           </el-tab-pane>
           <el-tab-pane label="商品管理" name="goods">
             <div class="goods-list">
-              <el-card v-for="goods in goodsList" :key="goods.id" class="goods-item">
-                <img :src="goods.images[0]?.imagePath || ''" alt="" class="goods-image" />
+              <el-card
+                v-for="goods in goodsList"
+                :key="goods.id"
+                class="goods-item"
+              >
+                <img
+                  :src="goods.images[0]?.imagePath || ''"
+                  alt=""
+                  class="goods-image"
+                />
                 <div class="goods-info">
                   <h4>{{ goods.name }}</h4>
                   <p class="goods-price">¥{{ goods.price }}</p>
-                  <p class="goods-status">{{ goods.status === 'active' ? '在售' : goods.status === 'sold' ? '已售出' : '已过期' }}</p>
+                  <p class="goods-status">
+                    {{
+                      goods.status === "active"
+                        ? "在售"
+                        : goods.status === "sold"
+                        ? "已售出"
+                        : "已过期"
+                    }}
+                  </p>
                   <div class="goods-actions">
-                    <el-button type="primary" @click="editGoods(goods.id)">编辑</el-button>
-                    <el-button type="danger" @click="deleteGoods(goods.id)">删除</el-button>
+                    <el-button type="primary" @click="editGoods(goods.id)"
+                      >编辑</el-button
+                    >
+                    <el-button type="danger" @click="deleteGoods(goods.id)"
+                      >删除</el-button
+                    >
                   </div>
                 </div>
               </el-card>
@@ -44,7 +77,11 @@
           </el-tab-pane>
           <el-tab-pane label="订单管理" name="orders">
             <div class="orders-list">
-              <el-card v-for="order in orders" :key="order.id" class="order-item">
+              <el-card
+                v-for="order in orders"
+                :key="order.id"
+                class="order-item"
+              >
                 <div class="order-info">
                   <h4>订单号: {{ order.orderNumber }}</h4>
                   <p>商品: {{ order.goodsName }}</p>
@@ -59,15 +96,33 @@
           </el-tab-pane>
           <el-tab-pane label="纠纷管理" name="disputes">
             <div class="disputes-list">
-              <el-card v-for="dispute in disputes" :key="dispute.id" class="dispute-item">
+              <el-card
+                v-for="dispute in disputes"
+                :key="dispute.id"
+                class="dispute-item"
+              >
                 <div class="dispute-info">
                   <h4>{{ dispute.title }}</h4>
                   <p>订单号: {{ dispute.orderNumber }}</p>
                   <p>提交用户: {{ dispute.userName }}</p>
-                  <p>状态: {{ dispute.status === 'pending' ? '待处理' : dispute.status === 'processing' ? '处理中' : '已解决' }}</p>
+                  <p>
+                    状态:
+                    {{
+                      dispute.status === "pending"
+                        ? "待处理"
+                        : dispute.status === "processing"
+                        ? "处理中"
+                        : "已解决"
+                    }}
+                  </p>
                   <p>描述: {{ dispute.description }}</p>
                   <div class="dispute-actions">
-                    <el-button v-if="dispute.status === 'pending'" type="primary" @click="handleDispute(dispute.id)">处理</el-button>
+                    <el-button
+                      v-if="dispute.status === 'pending'"
+                      type="primary"
+                      @click="handleDispute(dispute.id)"
+                      >处理</el-button
+                    >
                   </div>
                 </div>
               </el-card>
@@ -80,80 +135,80 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { useUserStore } from '../store'
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+import { useUserStore } from "../store";
 
-const router = useRouter()
+const router = useRouter();
 
-const userStore = useUserStore()
-const activeTab = ref('users')
-const users = ref([])
-const goodsList = ref([])
-const orders = ref([])
-const disputes = ref([])
+const userStore = useUserStore();
+const activeTab = ref("users");
+const users = ref([]);
+const goodsList = ref([]);
+const orders = ref([]);
+const disputes = ref([]);
 
 const getOrderStatusText = (status: string) => {
   const statusMap = {
-    'pending': '待支付',
-    'payed': '已支付',
-    'shipped': '已发货',
-    'received': '已收货',
-    'completed': '已完成',
-    'cancelled': '已取消'
-  }
-  return statusMap[status] || status
-}
+    pending: "待支付",
+    payed: "已支付",
+    shipped: "已发货",
+    received: "已收货",
+    completed: "已完成",
+    cancelled: "已取消",
+  };
+  return statusMap[status] || status;
+};
 
 const editUser = (userId: number) => {
   // 编辑用户逻辑
-}
+};
 
 const deleteUser = (userId: number) => {
   // 删除用户逻辑
-}
+};
 
 const editGoods = (goodsId: number) => {
   // 编辑商品逻辑
-}
+};
 
 const deleteGoods = (goodsId: number) => {
   // 删除商品逻辑
-}
+};
 
 const handleDispute = (disputeId: number) => {
   // 处理纠纷逻辑
-}
+};
 
 const fetchUsers = async () => {
   // 这里需要实现获取用户列表的API
-}
+};
 
 const fetchGoods = async () => {
   // 这里需要实现获取商品列表的API
-}
+};
 
 const fetchOrders = async () => {
   // 这里需要实现获取订单列表的API
-}
+};
 
 const fetchDisputes = async () => {
   // 这里需要实现获取纠纷列表的API
-}
+};
 
 onMounted(async () => {
-  if (!userStore.isLoggedIn || userStore.user?.role !== 'admin') {
-    ElMessage.error('权限不足')
-    router.push('/')
-    return
+  if (!userStore.isLoggedIn || userStore.user?.role !== "admin") {
+    ElMessage.error("权限不足");
+    router.push("/");
+    return;
   }
 
-  await fetchUsers()
-  await fetchGoods()
-  await fetchOrders()
-  await fetchDisputes()
-})
+  await fetchUsers();
+  await fetchGoods();
+  await fetchOrders();
+  await fetchDisputes();
+});
 </script>
 
 <style scoped lang="scss">

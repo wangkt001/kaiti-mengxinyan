@@ -1,8 +1,8 @@
-const { defineConfig } = require('@vue/cli-service')
+const { defineConfig } = require("@vue/cli-service");
 module.exports = defineConfig({
   transpileDependencies: true,
   configureWebpack: {
-    entry: './src/main.js'
+    entry: "./src/main.js",
   },
-  lintOnSave: false
-})
+  lintOnSave: false,
+});

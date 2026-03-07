@@ -1,7 +1,13 @@
 package com.campus.secondhand.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.campus.secondhand.model.Category;
 
-public interface CategoryService extends IService<Category> {
+import java.util.List;
+
+public interface CategoryService {
+    List<Category> list();
+    Category getById(Integer id);
+    void save(Category category);
+    void updateById(Category category);
+    void removeById(Integer id);
 }

@@ -1,37 +1,66 @@
 package com.campus.secondhand.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.campus.secondhand.dao.GoodsDao;
 import com.campus.secondhand.model.Goods;
 import com.campus.secondhand.service.GoodsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class GoodsServiceImpl extends ServiceImpl<GoodsDao, Goods> implements GoodsService {
+public class GoodsServiceImpl implements GoodsService {
+
+    @Autowired
+    private GoodsDao goodsDao;
 
     @Override
-    public List<Goods> findByCategoryId(Integer categoryId) {
-        QueryWrapper<Goods> wrapper = new QueryWrapper<>();
-        wrapper.eq("category_id", categoryId);
-        wrapper.eq("status", "active");
-        return baseMapper.selectList(wrapper);
+    public List<Goods> list() {
+        return goodsDao.list();
     }
 
     @Override
-    public List<Goods> findByUserId(Integer userId) {
-        QueryWrapper<Goods> wrapper = new QueryWrapper<>();
-        wrapper.eq("user_id", userId);
-        return baseMapper.selectList(wrapper);
+    public List<Goods> listByCategory(Integer categoryId) {
+        return goodsDao.listByCategory(categoryId);
+    }
+
+    @Override
+    public List<Goods> listByUser(Integer userId) {
+        return goodsDao.listByUser(userId);
     }
 
     @Override
     public List<Goods> search(String keyword) {
-        QueryWrapper<Goods> wrapper = new QueryWrapper<>();
-        wrapper.like("name", keyword).or().like("description", keyword);
-        wrapper.eq("status", "active");
-        return baseMapper.selectList(wrapper);
+        return goodsDao.search(keyword);
+    }
+
+    @Override
+    public Goods getById(Integer id) {
+        return goodsDao.getById(id);
+    }
+
+    @Override
+    public List<Goods> findByCategoryId(Integer categoryId) {
+        return goodsDao.listByCategory(categoryId);
+    }
+
+    @Override
+    public List<Goods> findByUserId(Integer userId) {
+        return goodsDao.listByUser(userId);
+    }
+
+    @Override
+    public void save(Goods goods) {
+        goodsDao.insert(goods);
+    }
+
+    @Override
+    public void updateById(Goods goods) {
+        goodsDao.update(goods);
+    }
+
+    @Override
+    public void removeById(Integer id) {
+        goodsDao.delete(id);
     }
 }

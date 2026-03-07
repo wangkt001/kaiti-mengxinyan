@@ -5,7 +5,11 @@
         <div class="goods-images">
           <el-carousel :interval="5000" type="card" height="400px">
             <el-carousel-item v-for="image in goods.images" :key="image.id">
-              <img :src="image.imagePath" alt="" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img
+                :src="image.imagePath"
+                alt=""
+                style="width: 100%; height: 100%; object-fit: cover"
+              />
             </el-carousel-item>
           </el-carousel>
         </div>
@@ -16,8 +20,12 @@
           <p class="goods-category">分类: {{ goods.categoryName }}</p>
           <p class="goods-description">{{ goods.description }}</p>
           <div class="goods-actions">
-            <el-button type="primary" size="large" @click="addToCart">加入购物车</el-button>
-            <el-button type="success" size="large" @click="buyNow">立即购买</el-button>
+            <el-button type="primary" size="large" @click="addToCart"
+              >加入购物车</el-button
+            >
+            <el-button type="success" size="large" @click="buyNow"
+              >立即购买</el-button
+            >
           </div>
         </div>
       </div>
@@ -27,7 +35,7 @@
           <img :src="seller?.avatar || ''" alt="" class="seller-avatar" />
           <div class="seller-info-text">
             <p>{{ seller?.realName }}</p>
-            <p>{{ seller?.role === 'student' ? '学生' : '教师' }}</p>
+            <p>{{ seller?.role === "student" ? "学生" : "教师" }}</p>
             <p>{{ seller?.idNumber }}</p>
           </div>
         </div>
@@ -37,33 +45,33 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { goodsApi } from '../api/modules/goods'
-import { userApi } from '../api/modules/user'
-import { orderApi } from '../api/modules/order'
-import { useUserStore } from '../store'
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+import { goodsApi } from "../api/modules/goods";
+import { userApi } from "../api/modules/user";
+import { orderApi } from "../api/modules/order";
+import { useUserStore } from "../store";
 
-const route = useRoute()
-const router = useRouter()
-const userStore = useUserStore()
-const goods = ref(null)
-const seller = ref(null)
+const route = useRoute();
+const router = useRouter();
+const userStore = useUserStore();
+const goods = ref(null);
+const seller = ref(null);
 
 const fetchGoodsDetail = async () => {
-  const goodsId = route.params.id
+  const goodsId = route.params.id;
   try {
-    const res = await goodsApi.detail(Number(goodsId))
-    goods.value = res
+    const res = await goodsApi.detail(Number(goodsId));
+    goods.value = res;
     // 获取卖家信息
     if (res.userId) {
-      await fetchSellerInfo(res.userId)
+      await fetchSellerInfo(res.userId);
     }
   } catch (error) {
-    console.error('获取商品详情失败:', error)
+    console.error("获取商品详情失败:", error);
   }
-}
+};
 
 const fetchSellerInfo = async (userId: number) => {
   try {
@@ -71,19 +79,19 @@ const fetchSellerInfo = async (userId: number) => {
     // const res = await userApi.getUserInfo(userId)
     // seller.value = res
   } catch (error) {
-    console.error('获取卖家信息失败:', error)
+    console.error("获取卖家信息失败:", error);
   }
-}
+};
 
 const addToCart = () => {
-  ElMessage.success('已加入购物车')
-}
+  ElMessage.success("已加入购物车");
+};
 
 const buyNow = async () => {
   if (!userStore.isLoggedIn) {
-    ElMessage.error('请先登录')
-    router.push('/login')
-    return
+    ElMessage.error("请先登录");
+    router.push("/login");
+    return;
   }
 
   if (goods.value) {
@@ -92,21 +100,21 @@ const buyNow = async () => {
         goodsId: goods.value.id,
         sellerId: goods.value.userId,
         quantity: 1,
-        totalPrice: goods.value.price
-      }
-      await orderApi.create(order)
-      ElMessage.success('订单创建成功')
-      router.push('/order/list')
+        totalPrice: goods.value.price,
+      };
+      await orderApi.create(order);
+      ElMessage.success("订单创建成功");
+      router.push("/order/list");
     } catch (error) {
-      console.error('创建订单失败:', error)
-      ElMessage.error('创建订单失败，请稍后重试')
+      console.error("创建订单失败:", error);
+      ElMessage.error("创建订单失败，请稍后重试");
     }
   }
-}
+};
 
 onMounted(() => {
-  fetchGoodsDetail()
-})
+  fetchGoodsDetail();
+});
 </script>
 
 <style scoped lang="scss">

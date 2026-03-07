@@ -7,15 +7,29 @@
         </div>
       </template>
       <div class="login-body">
-        <el-form :model="loginForm" :rules="loginRules" ref="loginFormRef" label-width="80px">
+        <el-form
+          :model="loginForm"
+          :rules="loginRules"
+          ref="loginFormRef"
+          label-width="80px"
+        >
           <el-form-item label="用户名" prop="username">
-            <el-input v-model="loginForm.username" placeholder="请输入用户名"></el-input>
+            <el-input
+              v-model="loginForm.username"
+              placeholder="请输入用户名"
+            ></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="password">
-            <el-input v-model="loginForm.password" type="password" placeholder="请输入密码"></el-input>
+            <el-input
+              v-model="loginForm.password"
+              type="password"
+              placeholder="请输入密码"
+            ></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="login" style="width: 100%;">登录</el-button>
+            <el-button type="primary" @click="login" style="width: 100%"
+              >登录</el-button
+            >
           </el-form-item>
           <el-form-item>
             <span>还没有账号？</span>
@@ -28,53 +42,52 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { userApi } from '../api/modules/user'
-import { useUserStore } from '../store'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+import { userApi } from "../api/modules/user";
+import { useUserStore } from "../store";
 
-const router = useRouter()
-const userStore = useUserStore()
-const loginFormRef = ref()
+const router = useRouter();
+const userStore = useUserStore();
+const loginFormRef = ref();
 const loginForm = ref({
-  username: '',
-  password: ''
-})
+  username: "",
+  password: "",
+});
 const loginRules = ref({
-  username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' }
-  ],
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' }
-  ]
-})
+  username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
+  password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+});
 
 const login = async () => {
   if (loginFormRef.value) {
     await loginFormRef.value.validate(async (valid: boolean) => {
       if (valid) {
         try {
-          const res = await userApi.login(loginForm.value.username, loginForm.value.password)
+          const res = await userApi.login(
+            loginForm.value.username,
+            loginForm.value.password,
+          );
           if (res) {
-            userStore.setUser(res)
-            ElMessage.success('登录成功')
-            router.push('/')
+            userStore.setUser(res);
+            ElMessage.success("登录成功");
+            router.push("/");
           } else {
-            ElMessage.error('用户名或密码错误')
+            ElMessage.error("用户名或密码错误");
           }
         } catch (error) {
-          console.error('登录失败:', error)
-          ElMessage.error('登录失败，请稍后重试')
+          console.error("登录失败:", error);
+          ElMessage.error("登录失败，请稍后重试");
         }
       }
-    })
+    });
   }
-}
+};
 
 const goToRegister = () => {
-  router.push('/register')
-}
+  router.push("/register");
+};
 </script>
 
 <style scoped lang="scss">

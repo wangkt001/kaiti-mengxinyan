@@ -1,46 +1,59 @@
 package com.campus.secondhand.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.campus.secondhand.dao.OrderDao;
 import com.campus.secondhand.model.Order;
 import com.campus.secondhand.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
-public class OrderServiceImpl extends ServiceImpl<OrderDao, Order> implements OrderService {
+public class OrderServiceImpl implements OrderService {
+
+    @Autowired
+    private OrderDao orderDao;
+
+    @Override
+    public List<Order> listByBuyer(Integer buyerId) {
+        return orderDao.listByBuyer(buyerId);
+    }
+
+    @Override
+    public List<Order> listBySeller(Integer sellerId) {
+        return orderDao.listBySeller(sellerId);
+    }
+
+    @Override
+    public Order getById(Integer id) {
+        return orderDao.getById(id);
+    }
 
     @Override
     public List<Order> findByBuyerId(Integer buyerId) {
-        QueryWrapper<Order> wrapper = new QueryWrapper<>();
-        wrapper.eq("buyer_id", buyerId);
-        return baseMapper.selectList(wrapper);
+        return orderDao.listByBuyer(buyerId);
     }
 
     @Override
     public List<Order> findBySellerId(Integer sellerId) {
-        QueryWrapper<Order> wrapper = new QueryWrapper<>();
-        wrapper.eq("seller_id", sellerId);
-        return baseMapper.selectList(wrapper);
+        return orderDao.listBySeller(sellerId);
     }
 
     @Override
     public Order createOrder(Order order) {
         order.setOrderNumber(UUID.randomUUID().toString().replace("-", ""));
         order.setStatus("pending");
-        baseMapper.insert(order);
+        orderDao.insert(order);
         return order;
     }
 
     @Override
     public void updateOrderStatus(Integer orderId, String status) {
-        Order order = baseMapper.selectById(orderId);
+        Order order = orderDao.getById(orderId);
         if (order != null) {
             order.setStatus(status);
-            baseMapper.updateById(order);
+            orderDao.update(order);
         }
     }
 }
