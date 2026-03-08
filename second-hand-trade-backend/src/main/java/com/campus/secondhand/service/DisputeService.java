@@ -18,4 +18,8 @@ public interface DisputeService {
     void resolveDispute(Integer disputeId, Integer adminId, String resolution);
 
     void save(Dispute dispute);
+
+    List<Dispute> listAll();
+
+    void updateStatus(Integer disputeId, String status);
 }

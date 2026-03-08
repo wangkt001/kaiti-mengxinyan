@@ -143,6 +143,9 @@ onMounted(async () => {
 <style scoped lang="scss">
 .goods-list {
   padding: 20px;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 
   .search-bar {
     margin-bottom: 20px;
@@ -155,6 +158,7 @@ onMounted(async () => {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
     margin-bottom: 20px;
+    flex: 1;
   }
 
   .goods-card {
@@ -208,6 +212,7 @@ onMounted(async () => {
     display: flex;
     justify-content: center;
     margin-top: 20px;
+    margin-bottom: 20px;
   }
 }
 </style>

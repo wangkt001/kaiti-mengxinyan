@@ -24,4 +24,10 @@ public interface GoodsService {
     void updateById(Goods goods);
 
     void removeById(Integer id);
+
+    List<Goods> listAll();
+
+    void updateGoods(Integer id, Goods goods);
+
+    void deleteGoods(Integer id);
 }

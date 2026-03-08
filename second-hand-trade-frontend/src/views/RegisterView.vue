@@ -7,27 +7,49 @@
         </div>
       </template>
       <div class="register-body">
-        <el-form :model="registerForm" :rules="registerRules" ref="registerFormRef" label-width="100px">
+        <el-form
+          :model="registerForm"
+          :rules="registerRules"
+          ref="registerFormRef"
+          label-width="100px"
+        >
           <el-form-item label="用户名" prop="username">
-            <el-input v-model="registerForm.username" placeholder="请输入用户名"></el-input>
+            <el-input
+              v-model="registerForm.username"
+              placeholder="请输入用户名"
+            ></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="password">
-            <el-input v-model="registerForm.password" type="password" placeholder="请输入密码"></el-input>
+            <el-input
+              v-model="registerForm.password"
+              type="password"
+              placeholder="请输入密码"
+            ></el-input>
           </el-form-item>
           <el-form-item label="确认密码" prop="confirmPassword">
-            <el-input v-model="registerForm.confirmPassword" type="password" placeholder="请确认密码"></el-input>
-          </el-form-item>
-          <el-form-item label="真实姓名" prop="realName">
-            <el-input v-model="registerForm.realName" placeholder="请输入真实姓名"></el-input>
+            <el-input
+              v-model="registerForm.confirmPassword"
+              type="password"
+              placeholder="请确认密码"
+            ></el-input>
           </el-form-item>
           <el-form-item label="学号/工号" prop="idNumber">
-            <el-input v-model="registerForm.idNumber" placeholder="请输入学号/工号"></el-input>
+            <el-input
+              v-model="registerForm.idNumber"
+              placeholder="请输入学号/工号"
+            ></el-input>
           </el-form-item>
           <el-form-item label="邮箱" prop="email">
-            <el-input v-model="registerForm.email" placeholder="请输入邮箱"></el-input>
+            <el-input
+              v-model="registerForm.email"
+              placeholder="请输入邮箱"
+            ></el-input>
           </el-form-item>
           <el-form-item label="手机号" prop="phone">
-            <el-input v-model="registerForm.phone" placeholder="请输入手机号"></el-input>
+            <el-input
+              v-model="registerForm.phone"
+              placeholder="请输入手机号"
+            ></el-input>
           </el-form-item>
           <el-form-item label="角色" prop="role">
             <el-select v-model="registerForm.role" placeholder="请选择角色">
@@ -36,7 +58,9 @@
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="register" style="width: 100%;">注册</el-button>
+            <el-button type="primary" @click="register" style="width: 100%"
+              >注册</el-button
+            >
           </el-form-item>
           <el-form-item>
             <span>已有账号？</span>
@@ -49,85 +73,72 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { userApi } from '../api/modules/user'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+import { userApi } from "../api/modules/user";
 
-const router = useRouter()
-const registerFormRef = ref()
+const router = useRouter();
+const registerFormRef = ref();
 const registerForm = ref({
-  username: '',
-  password: '',
-  confirmPassword: '',
-  realName: '',
-  idNumber: '',
-  email: '',
-  phone: '',
-  role: 'student'
-})
+  username: "",
+  password: "",
+  confirmPassword: "",
+  idNumber: "",
+  email: "",
+  phone: "",
+  role: "student",
+});
 const registerRules = ref({
-  username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' }
-  ],
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' }
-  ],
+  username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
+  password: [{ required: true, message: "请输入密码", trigger: "blur" }],
   confirmPassword: [
-    { required: true, message: '请确认密码', trigger: 'blur' },
+    { required: true, message: "请确认密码", trigger: "blur" },
     {
       validator: (rule: any, value: string, callback: any) => {
         if (value !== registerForm.value.password) {
-          callback(new Error('两次输入的密码不一致'))
+          callback(new Error("两次输入的密码不一致"));
         } else {
-          callback()
+          callback();
         }
       },
-      trigger: 'blur'
-    }
+      trigger: "blur",
+    },
   ],
-  realName: [
-    { required: true, message: '请输入真实姓名', trigger: 'blur' }
-  ],
-  idNumber: [
-    { required: true, message: '请输入学号/工号', trigger: 'blur' }
-  ],
+
+  idNumber: [{ required: true, message: "请输入学号/工号", trigger: "blur" }],
   email: [
-    { required: true, message: '请输入邮箱', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
+    { required: true, message: "请输入邮箱", trigger: "blur" },
+    { type: "email", message: "请输入正确的邮箱格式", trigger: "blur" },
   ],
-  phone: [
-    { required: true, message: '请输入手机号', trigger: 'blur' }
-  ],
-  role: [
-    { required: true, message: '请选择角色', trigger: 'blur' }
-  ]
-})
+  phone: [{ required: true, message: "请输入手机号", trigger: "blur" }],
+  role: [{ required: true, message: "请选择角色", trigger: "blur" }],
+});
 
 const register = async () => {
   if (registerFormRef.value) {
     await registerFormRef.value.validate(async (valid: boolean) => {
       if (valid) {
         try {
-          const res = await userApi.register(registerForm.value)
+          const res = await userApi.register(registerForm.value);
           if (res) {
-            ElMessage.success('注册成功')
-            router.push('/login')
+            ElMessage.success("注册成功");
+            router.push("/login");
           } else {
-            ElMessage.error('注册失败，请稍后重试')
+            ElMessage.error("注册失败，请稍后重试");
           }
         } catch (error) {
-          console.error('注册失败:', error)
-          ElMessage.error('注册失败，请稍后重试')
+          console.error("注册失败:", error);
+          ElMessage.error("注册失败，请稍后重试");
         }
       }
-    })
+    });
   }
-}
+};
 
 const goToLogin = () => {
-  router.push('/login')
-}
+  router.push("/login");
+};
 </script>
 
 <style scoped lang="scss">

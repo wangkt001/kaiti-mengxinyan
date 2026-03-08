@@ -20,6 +20,12 @@ public class Order implements Serializable {
 
     private Integer goodsId;
 
+    private String goodsName;
+
+    private String buyerName;
+
+    private String sellerName;
+
     private Integer quantity;
 
     private BigDecimal totalPrice;

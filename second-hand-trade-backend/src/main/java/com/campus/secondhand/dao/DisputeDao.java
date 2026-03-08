@@ -19,6 +19,9 @@ public interface DisputeDao {
     @Select("SELECT * FROM disputes WHERE id = #{id}")
     Dispute getById(Integer id);
 
+    @Select("SELECT * FROM disputes")
+    List<Dispute> listAll();
+
     @Update("UPDATE disputes SET status = #{status}, admin_id = #{adminId}, resolution = #{resolution}, updated_at = #{updatedAt} WHERE id = #{id}")
     void update(Dispute dispute);
 

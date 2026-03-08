@@ -34,6 +34,11 @@
           >
         </el-menu>
       </div>
+      <div class="cart-icon" @click="goToCart">
+        <el-badge :value="cartCount" class="item">
+          <el-icon size="24"><ShoppingCart /></el-icon>
+        </el-badge>
+      </div>
     </div>
   </el-header>
 </template>
@@ -41,16 +46,19 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { useUserStore } from "../store/index.js";
+import { ShoppingCart } from "@element-plus/icons-vue";
+import { useUserStore, useCartStore } from "../store/index.js";
 import { userApi } from "../api/modules/user.js";
 
 const router = useRouter();
 const route = useRoute();
 const userStore = useUserStore();
+const cartStore = useCartStore();
 const activeIndex = ref("/");
 
 const isLoggedIn = computed(() => userStore.isLoggedIn);
 const user = computed(() => userStore.user);
+const cartCount = computed(() => cartStore.cartCount);
 
 const handleSelect = (key) => {
   if (key === "/logout") {
@@ -70,12 +78,19 @@ const logout = async () => {
   }
 };
 
+const goToCart = () => {
+  // 跳转到购物车页面
+  router.push("/cart");
+};
+
 const checkLoginStatus = () => {
   // 从localStorage中恢复用户信息
   const user = JSON.parse(localStorage.getItem("user"));
   if (user && user.id) {
     userStore.setUser(user);
   }
+  // 加载购物车数据
+  cartStore.loadCart();
 };
 
 onMounted(() => {
@@ -129,6 +144,18 @@ watch(
 .el-menu-item.is-active {
   background-color: rgba(255, 255, 255, 0.2);
   color: white;
+}
+
+.cart-icon {
+  margin-left: 20px;
+  cursor: pointer;
+  color: white;
+  display: flex;
+  align-items: center;
+}
+
+.cart-icon:hover {
+  color: #f0f9ff;
 }
 
 .fixed-header {

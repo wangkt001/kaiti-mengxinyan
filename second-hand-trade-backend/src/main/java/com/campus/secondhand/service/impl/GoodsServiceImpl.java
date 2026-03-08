@@ -63,4 +63,46 @@ public class GoodsServiceImpl implements GoodsService {
     public void removeById(Integer id) {
         goodsDao.delete(id);
     }
+
+    @Override
+    public List<Goods> listAll() {
+        return goodsDao.listAll();
+    }
+
+    @Override
+    public void updateGoods(Integer id, Goods goods) {
+        Goods existingGoods = goodsDao.getById(id);
+        if (existingGoods != null) {
+            if (goods.getName() != null) {
+                existingGoods.setName(goods.getName());
+            }
+            if (goods.getDescription() != null) {
+                existingGoods.setDescription(goods.getDescription());
+            }
+            if (goods.getPrice() != null) {
+                existingGoods.setPrice(goods.getPrice());
+            }
+            if (goods.getStock() != null) {
+                existingGoods.setStock(goods.getStock());
+            }
+            if (goods.getCategoryId() != null) {
+                existingGoods.setCategoryId(goods.getCategoryId());
+            }
+            if (goods.getUserId() != null) {
+                existingGoods.setUserId(goods.getUserId());
+            }
+            if (goods.getStatus() != null) {
+                existingGoods.setStatus(goods.getStatus());
+            }
+            if (goods.getViewCount() != null) {
+                existingGoods.setViewCount(goods.getViewCount());
+            }
+            goodsDao.update(existingGoods);
+        }
+    }
+
+    @Override
+    public void deleteGoods(Integer id) {
+        goodsDao.delete(id);
+    }
 }

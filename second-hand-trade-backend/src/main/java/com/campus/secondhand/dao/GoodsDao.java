@@ -5,8 +5,11 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.Many;
 
 import java.util.List;
 
@@ -14,6 +17,13 @@ import java.util.List;
 public interface GoodsDao {
     @Select("SELECT id, name, description, price, stock, category_id as categoryId, user_id as userId, status, created_at as createdAt, updated_at as updatedAt FROM goods WHERE status = 'active'")
     List<Goods> list();
+
+    @Select("SELECT id, name, description, price, stock, category_id as categoryId, user_id as userId, status, created_at as createdAt, updated_at as updatedAt FROM goods")
+    @Results({
+            @Result(property = "id", column = "id"),
+            @Result(property = "images", column = "id", many = @Many(select = "com.campus.secondhand.dao.GoodsImageDao.listByGoodsId"))
+    })
+    List<Goods> listAll();
 
     @Select("SELECT id, name, description, price, stock, category_id as categoryId, user_id as userId, status, created_at as createdAt, updated_at as updatedAt FROM goods WHERE category_id = #{categoryId} AND status = 'active'")
     List<Goods> listByCategory(Integer categoryId);

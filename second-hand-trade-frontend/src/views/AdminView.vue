@@ -13,7 +13,6 @@
               <el-card v-for="user in users" :key="user.id" class="user-item">
                 <div class="user-info">
                   <h4>{{ user.username }}</h4>
-                  <p>真实姓名: {{ user.realName }}</p>
                   <p>
                     角色:
                     {{
@@ -47,7 +46,11 @@
                 class="goods-item"
               >
                 <img
-                  :src="goods.images[0]?.imagePath || ''"
+                  :src="
+                    goods.images && goods.images.length > 0
+                      ? goods.images[0].imageData
+                      : ''
+                  "
                   alt=""
                   class="goods-image"
                 />
@@ -137,8 +140,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElConfirm } from "element-plus";
 import { useUserStore } from "../store";
+import api from "../api/index";
 
 const router = useRouter();
 
@@ -163,38 +167,105 @@ const getOrderStatusText = (status: string) => {
 
 const editUser = (userId: number) => {
   // 编辑用户逻辑
+  ElMessage.info("编辑用户功能待实现");
 };
 
-const deleteUser = (userId: number) => {
-  // 删除用户逻辑
+const deleteUser = async (userId: number) => {
+  ElConfirm({
+    title: "确认删除",
+    message: "确定要删除这个用户吗？",
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+    async confirm() {
+      try {
+        await api.delete(`/admin/users/${userId}`);
+        ElMessage.success("删除成功");
+        await fetchUsers();
+      } catch (error) {
+        console.error("删除用户失败:", error);
+        ElMessage.error("删除失败，请稍后重试");
+      }
+    },
+  });
 };
 
 const editGoods = (goodsId: number) => {
   // 编辑商品逻辑
+  ElMessage.info("编辑商品功能待实现");
 };
 
-const deleteGoods = (goodsId: number) => {
-  // 删除商品逻辑
+const deleteGoods = async (goodsId: number) => {
+  ElConfirm({
+    title: "确认删除",
+    message: "确定要删除这个商品吗？",
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+    async confirm() {
+      try {
+        await api.delete(`/admin/goods/${goodsId}`);
+        ElMessage.success("删除成功");
+        await fetchGoods();
+      } catch (error) {
+        console.error("删除商品失败:", error);
+        ElMessage.error("删除失败，请稍后重试");
+      }
+    },
+  });
 };
 
-const handleDispute = (disputeId: number) => {
-  // 处理纠纷逻辑
+const handleDispute = async (disputeId: number) => {
+  try {
+    await api.put(`/admin/disputes/${disputeId}/status`, {
+      status: "processing",
+    });
+    ElMessage.success("开始处理纠纷");
+    await fetchDisputes();
+  } catch (error) {
+    console.error("处理纠纷失败:", error);
+    ElMessage.error("处理失败，请稍后重试");
+  }
 };
 
 const fetchUsers = async () => {
-  // 这里需要实现获取用户列表的API
+  try {
+    const res = await api.get("/admin/users");
+    users.value = res;
+  } catch (error) {
+    console.error("获取用户列表失败:", error);
+    ElMessage.error("获取用户列表失败");
+  }
 };
 
 const fetchGoods = async () => {
-  // 这里需要实现获取商品列表的API
+  try {
+    const res = await api.get("/admin/goods");
+    goodsList.value = res;
+  } catch (error) {
+    console.error("获取商品列表失败:", error);
+    ElMessage.error("获取商品列表失败");
+  }
 };
 
 const fetchOrders = async () => {
-  // 这里需要实现获取订单列表的API
+  try {
+    const res = await api.get("/admin/orders");
+    orders.value = res;
+  } catch (error) {
+    console.error("获取订单列表失败:", error);
+    ElMessage.error("获取订单列表失败");
+  }
 };
 
 const fetchDisputes = async () => {
-  // 这里需要实现获取纠纷列表的API
+  try {
+    const res = await api.get("/admin/disputes");
+    disputes.value = res;
+  } catch (error) {
+    console.error("获取纠纷列表失败:", error);
+    ElMessage.error("获取纠纷列表失败");
+  }
 };
 
 onMounted(async () => {

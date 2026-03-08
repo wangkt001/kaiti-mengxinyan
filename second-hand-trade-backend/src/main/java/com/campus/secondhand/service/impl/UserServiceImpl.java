@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -61,5 +63,44 @@ public class UserServiceImpl implements UserService {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
         userDao.update(user);
+    }
+
+    @Override
+    public List<User> listAll() {
+        return userDao.listAll();
+    }
+
+    @Override
+    public void updateUser(Integer id, User user) {
+        User existingUser = userDao.getById(id);
+        if (existingUser != null) {
+            if (user.getUsername() != null) {
+                existingUser.setUsername(user.getUsername());
+            }
+            if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+                existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
+            if (user.getIdNumber() != null) {
+                existingUser.setIdNumber(user.getIdNumber());
+            }
+            if (user.getPhone() != null) {
+                existingUser.setPhone(user.getPhone());
+            }
+            if (user.getEmail() != null) {
+                existingUser.setEmail(user.getEmail());
+            }
+            if (user.getRole() != null) {
+                existingUser.setRole(user.getRole());
+            }
+            if (user.getAvatar() != null) {
+                existingUser.setAvatar(user.getAvatar());
+            }
+            userDao.update(existingUser);
+        }
+    }
+
+    @Override
+    public void deleteUser(Integer id) {
+        userDao.delete(id);
     }
 }

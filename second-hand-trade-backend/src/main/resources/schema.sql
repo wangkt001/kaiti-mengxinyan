@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS goods_images (
 -- 创建订单表
 CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    order_number VARCHAR(50) UNIQUE NOT NULL,
     goods_id INT,
     buyer_id INT,
     seller_id INT,

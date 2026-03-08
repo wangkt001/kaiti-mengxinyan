@@ -4,7 +4,6 @@ import com.campus.secondhand.model.GoodsImage;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -15,9 +14,8 @@ public interface GoodsImageDao {
     List<GoodsImage> listByGoodsId(Integer goodsId);
 
     @Insert("INSERT INTO goods_images (goods_id, image_data, created_at) VALUES (#{goodsId}, #{imageData}, #{createdAt})")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
     void insert(GoodsImage goodsImage);
 
-    @Delete("DELETE FROM goods_images WHERE id = #{id}")
-    void delete(Integer id);
+    @Delete("DELETE FROM goods_images WHERE goods_id = #{goodsId}")
+    void delete(Integer goodsId);
 }

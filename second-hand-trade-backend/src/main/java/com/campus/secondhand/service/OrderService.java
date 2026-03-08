@@ -18,4 +18,6 @@ public interface OrderService {
     Order createOrder(Order order);
 
     void updateOrderStatus(Integer orderId, String status);
+
+    List<Order> listAll();
 }

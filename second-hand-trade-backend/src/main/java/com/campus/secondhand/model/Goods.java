@@ -5,6 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class Goods implements Serializable {
@@ -26,7 +27,11 @@ public class Goods implements Serializable {
 
     private String status;
 
+    private Integer viewCount;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    private List<GoodsImage> images;
 }

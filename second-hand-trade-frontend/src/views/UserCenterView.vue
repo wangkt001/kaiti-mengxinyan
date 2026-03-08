@@ -16,10 +16,9 @@
             />
           </div>
           <div class="user-details">
-            <h3>{{ user?.realName }}</h3>
             <p>
-              {{
-                user?.role === "student"
+              {{ 
+                user?.role === "student" 
                   ? "学生"
                   : user?.role === "teacher"
                   ? "教师"

@@ -34,7 +34,6 @@
         <div class="seller-details">
           <img :src="seller?.avatar || ''" alt="" class="seller-avatar" />
           <div class="seller-info-text">
-            <p>{{ seller?.realName }}</p>
             <p>{{ seller?.role === "student" ? "学生" : "教师" }}</p>
             <p>{{ seller?.phone }}</p>
             <p>{{ seller?.idNumber }}</p>
@@ -52,11 +51,12 @@ import { ElMessage } from "element-plus";
 import { goodsApi } from "../api/modules/goods";
 import { userApi } from "../api/modules/user";
 import { orderApi } from "../api/modules/order";
-import { useUserStore } from "../store";
+import { useUserStore, useCartStore } from "../store";
 
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
+const cartStore = useCartStore();
 const goods = ref(null);
 const seller = ref(null);
 
@@ -90,6 +90,9 @@ const fetchSellerInfo = async (userId: number) => {
 };
 
 const addToCart = () => {
+  if (!goods.value) return;
+
+  cartStore.addToCart(goods.value);
   ElMessage.success("已加入购物车");
 };
 

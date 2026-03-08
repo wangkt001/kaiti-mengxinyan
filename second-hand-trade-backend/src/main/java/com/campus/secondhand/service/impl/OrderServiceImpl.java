@@ -42,8 +42,15 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order createOrder(Order order) {
-        order.setOrderNumber(UUID.randomUUID().toString().replace("-", ""));
-        order.setStatus("pending");
+        // 生成订单号：时间戳 + 两位随机数
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        int random = (int) (Math.random() * 100);
+        String orderNumber = timestamp + String.format("%02d", random);
+        order.setOrderNumber(orderNumber);
+
+        order.setStatus("completed");
+        order.setCreatedAt(java.time.LocalDateTime.now());
+        order.setUpdatedAt(java.time.LocalDateTime.now());
         orderDao.insert(order);
         return order;
     }
@@ -55,5 +62,10 @@ public class OrderServiceImpl implements OrderService {
             order.setStatus(status);
             orderDao.update(order);
         }
+    }
+
+    @Override
+    public List<Order> listAll() {
+        return orderDao.listAll();
     }
 }

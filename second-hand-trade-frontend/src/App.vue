@@ -29,11 +29,26 @@ export default defineComponent({
 <style scoped>
 #app {
   height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.el-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   padding-top: 60px;
 }
 
 .el-main {
+  flex: 1;
   padding-top: 20px;
+  overflow-y: auto;
+}
+
+.el-footer {
+  height: 60px !important;
+  flex-shrink: 0;
 }
 
 .footer-content {
