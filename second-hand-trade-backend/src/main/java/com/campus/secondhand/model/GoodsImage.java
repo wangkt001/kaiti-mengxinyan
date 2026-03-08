@@ -13,7 +13,7 @@ public class GoodsImage implements Serializable {
 
     private Integer goodsId;
 
-    private String imagePath;
+    private String imageData;
 
     private LocalDateTime createdAt;
 }

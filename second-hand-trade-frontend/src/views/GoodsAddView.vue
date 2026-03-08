@@ -59,6 +59,7 @@
               class="upload-demo"
               action=""
               :on-change="handleImageChange"
+              :on-remove="handleRemove"
               :auto-upload="false"
               list-type="picture-card"
               :limit="5"
@@ -103,6 +104,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { Plus, ZoomIn, Delete } from "@element-plus/icons-vue";
+import api from "../api/index";
 import { goodsApi } from "../api/modules/goods";
 import { categoryApi } from "../api/modules/category";
 import { goodsImageApi } from "../api/modules/goodsImage";
@@ -136,8 +138,8 @@ const dialogVisible = ref(false);
 const dialogImageUrl = ref("");
 const imageList = ref([]);
 
-const handleImageChange = (file: any) => {
-  imageList.value.push(file);
+const handleImageChange = (file: any, fileList: any[]) => {
+  imageList.value = fileList;
 };
 
 const handlePictureCardPreview = (file: any) => {
@@ -145,11 +147,8 @@ const handlePictureCardPreview = (file: any) => {
   dialogVisible.value = true;
 };
 
-const handleRemove = (file: any) => {
-  const index = imageList.value.indexOf(file);
-  if (index > -1) {
-    imageList.value.splice(index, 1);
-  }
+const handleRemove = (file: any, fileList: any[]) => {
+  imageList.value = fileList;
 };
 
 const submitForm = async () => {
@@ -163,16 +162,54 @@ const submitForm = async () => {
         }
 
         try {
-          const res = await goodsApi.add(goodsForm.value);
+          // 获取当前登录用户的ID
+          const user = JSON.parse(localStorage.getItem("user"));
+          if (!user || !user.id) {
+            ElMessage.error("请先登录");
+            router.push("/login");
+            return;
+          }
+
+          // 添加用户ID到商品表单
+          const goodsData = {
+            ...goodsForm.value,
+            userId: user.id,
+          };
+
+          const res = await goodsApi.add(goodsData);
           if (res) {
             // 上传图片逻辑
             if (imageList.value.length > 0) {
+              const imageIds = [];
               for (const file of imageList.value) {
-                await goodsImageApi.add({
-                  goodsId: res.id,
-                  imagePath: file.url,
-                });
+                // 创建FormData对象
+                const formData = new FormData();
+                formData.append("file", file.raw);
+                formData.append("goodsId", res.id);
+
+                // 上传图片
+                console.log("上传图片:", file.raw);
+                console.log("商品ID:", res.id);
+                console.log("FormData内容:", formData);
+
+                try {
+                  const imageRes = await api.post(
+                    "/goods-image/upload",
+                    formData,
+                    {
+                      headers: {
+                        "Content-Type": "multipart/form-data",
+                      },
+                    },
+                  );
+                  console.log("图片上传成功:", imageRes);
+                  imageIds.push(imageRes.id);
+                } catch (error) {
+                  console.error("图片上传失败:", error);
+                  throw error;
+                }
               }
+              console.log("上传的图片ID:", imageIds);
             }
             ElMessage.success("商品发布成功");
             router.push("/");

@@ -67,4 +67,16 @@ public class UserController {
             return null;
         }
     }
+
+    @GetMapping("/getById/{id}")
+    public User getById(@PathVariable Integer id) {
+        try {
+            User user = userService.getById(id);
+            return user;
+        } catch (Exception e) {
+            System.out.println("Error in getById: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

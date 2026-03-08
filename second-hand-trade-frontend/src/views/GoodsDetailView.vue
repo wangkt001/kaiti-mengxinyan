@@ -6,7 +6,7 @@
           <el-carousel :interval="5000" type="card" height="400px">
             <el-carousel-item v-for="image in goods.images" :key="image.id">
               <img
-                :src="image.imagePath"
+                :src="image.imageData"
                 alt=""
                 style="width: 100%; height: 100%; object-fit: cover"
               />
@@ -36,6 +36,7 @@
           <div class="seller-info-text">
             <p>{{ seller?.realName }}</p>
             <p>{{ seller?.role === "student" ? "学生" : "教师" }}</p>
+            <p>{{ seller?.phone }}</p>
             <p>{{ seller?.idNumber }}</p>
           </div>
         </div>
@@ -63,10 +64,14 @@ const fetchGoodsDetail = async () => {
   const goodsId = route.params.id;
   try {
     const res = await goodsApi.detail(Number(goodsId));
+    console.log("商品详情数据:", res);
     goods.value = res;
     // 获取卖家信息
     if (res.userId) {
+      console.log("获取卖家信息，用户ID:", res.userId);
       await fetchSellerInfo(res.userId);
+    } else {
+      console.log("商品没有关联用户ID");
     }
   } catch (error) {
     console.error("获取商品详情失败:", error);
@@ -75,9 +80,10 @@ const fetchGoodsDetail = async () => {
 
 const fetchSellerInfo = async (userId: number) => {
   try {
-    // 这里需要实现获取用户信息的API
-    // const res = await userApi.getUserInfo(userId)
-    // seller.value = res
+    console.log("开始获取卖家信息，用户ID:", userId);
+    const res = await userApi.getUserInfo(userId);
+    console.log("卖家信息:", res);
+    seller.value = res;
   } catch (error) {
     console.error("获取卖家信息失败:", error);
   }

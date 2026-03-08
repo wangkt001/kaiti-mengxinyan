@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS goods (
 CREATE TABLE IF NOT EXISTS goods_images (
     id INT AUTO_INCREMENT PRIMARY KEY,
     goods_id INT,
-    image_url VARCHAR(255) NOT NULL,
+    image_data LONGTEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (goods_id) REFERENCES goods(id)
 );

@@ -34,7 +34,11 @@
     <div class="goods-grid">
       <el-card v-for="goods in goodsList" :key="goods.id" class="goods-card">
         <img
-          :src="goods.images[0]?.imagePath || ''"
+          :src="
+            goods.images && goods.images.length > 0
+              ? goods.images[0].imageData
+              : ''
+          "
           alt=""
           class="goods-image"
         />
@@ -154,15 +158,18 @@ onMounted(async () => {
   }
 
   .goods-card {
-    height: 300px;
+    height: 280px;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    padding: 10px;
 
     .goods-image {
       width: 100%;
-      height: 200px;
+      height: 120px;
       object-fit: cover;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
+      border-radius: 4px;
     }
 
     .goods-info {
@@ -172,20 +179,27 @@ onMounted(async () => {
       justify-content: space-between;
 
       h3 {
-        font-size: 16px;
-        margin-bottom: 10px;
+        font-size: 13px;
+        margin-bottom: 6px;
         overflow: hidden;
         text-overflow: ellipsis;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
+        line-height: 1.3;
       }
 
       .goods-price {
-        font-size: 18px;
+        font-size: 15px;
         color: #f56c6c;
         font-weight: bold;
-        margin-bottom: 10px;
+        margin-bottom: 6px;
+      }
+
+      .el-button {
+        font-size: 12px;
+        padding: 4px 12px;
+        height: 28px;
       }
     }
   }

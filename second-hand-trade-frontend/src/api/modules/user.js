@@ -13,6 +13,9 @@ export const userApi = {
   getInfo: () => {
     return api.get("/user/info");
   },
+  getUserInfo: (userId) => {
+    return api.get(`/user/getById/${userId}`);
+  },
   update: (user) => {
     return api.put("/user/update", user);
   },
