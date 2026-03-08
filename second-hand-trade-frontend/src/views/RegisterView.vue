@@ -16,7 +16,13 @@
           <el-form-item label="用户名" prop="username">
             <el-input
               v-model="registerForm.username"
-              placeholder="请输入用户名"
+              placeholder="请输入用户名（只能使用英文字母）"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="真实姓名" prop="realName">
+            <el-input
+              v-model="registerForm.realName"
+              placeholder="请输入真实姓名"
             ></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="password">
@@ -82,6 +88,7 @@ const router = useRouter();
 const registerFormRef = ref();
 const registerForm = ref({
   username: "",
+  realName: "",
   password: "",
   confirmPassword: "",
   idNumber: "",
@@ -90,7 +97,15 @@ const registerForm = ref({
   role: "student",
 });
 const registerRules = ref({
-  username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
+  username: [
+    { required: true, message: "请输入用户名", trigger: "blur" },
+    {
+      pattern: /^[a-zA-Z]+$/,
+      message: "用户名只能使用英文字母",
+      trigger: "blur",
+    },
+  ],
+  realName: [{ required: true, message: "请输入真实姓名", trigger: "blur" }],
   password: [{ required: true, message: "请输入密码", trigger: "blur" }],
   confirmPassword: [
     { required: true, message: "请确认密码", trigger: "blur" },

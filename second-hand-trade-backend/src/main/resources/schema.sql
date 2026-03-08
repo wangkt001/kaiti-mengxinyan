@@ -83,12 +83,16 @@ CREATE TABLE IF NOT EXISTS disputes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT,
     user_id INT,
-    reason TEXT NOT NULL,
+    title VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
     status VARCHAR(20) DEFAULT 'pending',
+    admin_id INT,
+    resolution TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (order_id) REFERENCES orders(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (admin_id) REFERENCES users(id)
 );
 
 -- 插入默认分类数据

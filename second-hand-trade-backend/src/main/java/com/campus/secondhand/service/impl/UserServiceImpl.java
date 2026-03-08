@@ -38,6 +38,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User register(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        // 设置realName，使用username作为默认值
+        if (user.getRealName() == null || user.getRealName().isEmpty()) {
+            user.setRealName(user.getUsername());
+        }
+        user.setCreatedAt(java.time.LocalDateTime.now());
+        user.setUpdatedAt(java.time.LocalDateTime.now());
         userDao.insert(user);
         return user;
     }

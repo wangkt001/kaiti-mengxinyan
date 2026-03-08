@@ -25,6 +25,8 @@ public class User implements Serializable {
 
     private String avatar;
 
+    private String realName;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

@@ -56,7 +56,7 @@
               <span>浏览 {{ goods.views }}</span>
               <span>{{ goods.createdAt }}</span>
             </div>
-            <el-button type="primary" size="small" @click="goToDetail(goods.id)"
+            <el-button type="primary" size="small" @click="router.push('/goods/list')"
               >查看详情</el-button
             >
           </div>
@@ -80,7 +80,7 @@
               <span>浏览 {{ goods.views }}</span>
               <span>{{ goods.createdAt }}</span>
             </div>
-            <el-button type="primary" size="small" @click="goToDetail(goods.id)"
+            <el-button type="primary" size="small" @click="router.push('/goods/list')"
               >查看详情</el-button
             >
           </div>

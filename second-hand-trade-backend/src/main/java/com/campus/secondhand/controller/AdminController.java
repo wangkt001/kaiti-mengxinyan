@@ -79,7 +79,20 @@ public class AdminController {
     }
 
     @PutMapping("/disputes/{id}/status")
-    public void updateDisputeStatus(@PathVariable Integer id, @RequestParam String status) {
-        disputeService.updateStatus(id, status);
+    public void updateDisputeStatus(@PathVariable Integer id, @RequestBody DisputeStatusRequest statusRequest) {
+        disputeService.updateStatus(id, statusRequest.getStatus());
+    }
+    
+    // 用于接收状态更新请求的内部类
+    private static class DisputeStatusRequest {
+        private String status;
+        
+        public String getStatus() {
+            return status;
+        }
+        
+        public void setStatus(String status) {
+            this.status = status;
+        }
     }
 }

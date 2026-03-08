@@ -40,6 +40,12 @@
                       @click="evaluateOrder(order.id)"
                       >评价</el-button
                     >
+                    <el-button
+                      v-else-if="order.status === 'completed'"
+                      type="warning"
+                      @click="applyAfterSale(order.id)"
+                      >售后申请</el-button
+                    >
                   </div>
                 </div>
               </el-card>
@@ -79,14 +85,67 @@
         </el-tabs>
       </div>
     </el-card>
+
+    <!-- 售后申请对话框 -->
+    <el-dialog v-model="afterSaleDialogVisible" title="售后申请" width="500px">
+      <el-form
+        :model="afterSaleForm"
+        :rules="afterSaleRules"
+        ref="afterSaleFormRef"
+      >
+        <el-form-item label="订单号" prop="orderNumber">
+          <el-input v-model="afterSaleForm.orderNumber" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="商品名称" prop="goodsName">
+          <el-input v-model="afterSaleForm.goodsName" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="售后类型" prop="type">
+          <el-select v-model="afterSaleForm.type" placeholder="请选择售后类型">
+            <el-option label="退款" value="refund"></el-option>
+            <el-option label="换货" value="exchange"></el-option>
+            <el-option label="维修" value="repair"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="售后原因" prop="title">
+          <el-select v-model="afterSaleForm.title" placeholder="请选择售后原因">
+            <el-option
+              label="商品与描述不符"
+              value="商品与描述不符"
+            ></el-option>
+            <el-option label="商品质量问题" value="商品质量问题"></el-option>
+            <el-option label="未收到商品" value="未收到商品"></el-option>
+            <el-option label="商品损坏" value="商品损坏"></el-option>
+            <el-option label="规格/尺寸不符" value="规格/尺寸不符"></el-option>
+            <el-option label="其他原因" value="其他原因"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="详细描述" prop="description">
+          <el-input
+            v-model="afterSaleForm.description"
+            type="textarea"
+            :rows="4"
+            placeholder="请详细描述问题"
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="afterSaleDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="submitAfterSale"
+            >提交申请</el-button
+          >
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElForm } from "element-plus";
 import { orderApi } from "../api/modules/order";
+import { disputeApi } from "../api/modules/dispute";
 import { useUserStore } from "../store";
 
 const router = useRouter();
@@ -95,6 +154,23 @@ const userStore = useUserStore();
 const activeTab = ref("buyer");
 const buyerOrders = ref([]);
 const sellerOrders = ref([]);
+
+// 售后申请相关
+const afterSaleDialogVisible = ref(false);
+const afterSaleFormRef = ref<InstanceType<typeof ElForm>>();
+const afterSaleForm = ref({
+  orderId: 0,
+  orderNumber: "",
+  goodsName: "",
+  type: "",
+  title: "",
+  description: "",
+});
+const afterSaleRules = ref({
+  type: [{ required: true, message: "请选择售后类型", trigger: "blur" }],
+  title: [{ required: true, message: "请输入售后原因", trigger: "blur" }],
+  description: [{ required: true, message: "请详细描述问题", trigger: "blur" }],
+});
 
 const getOrderStatusText = (status: string) => {
   const statusMap = {
@@ -143,6 +219,47 @@ const confirmReceive = async (orderId: number) => {
 
 const evaluateOrder = (orderId: number) => {
   // 评价订单逻辑
+};
+
+const applyAfterSale = (orderId: number) => {
+  const order = buyerOrders.value.find((o) => o.id === orderId);
+  if (order) {
+    afterSaleForm.value = {
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      goodsName: order.goodsName,
+      type: "",
+      title: "",
+      description: "",
+    };
+    afterSaleDialogVisible.value = true;
+  }
+};
+
+const submitAfterSale = async () => {
+  if (afterSaleFormRef.value) {
+    await afterSaleFormRef.value.validate(async (valid) => {
+      if (valid) {
+        try {
+          const dispute = {
+            orderId: afterSaleForm.value.orderId,
+            userId: userStore.user?.id,
+            title: afterSaleForm.value.title,
+            description: afterSaleForm.value.description,
+            status: "pending",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+          await disputeApi.add(dispute);
+          ElMessage.success("售后申请提交成功");
+          afterSaleDialogVisible.value = false;
+        } catch (error) {
+          console.error("提交售后申请失败:", error);
+          ElMessage.error("提交失败，请稍后重试");
+        }
+      }
+    });
+  }
 };
 
 const fetchBuyerOrders = async () => {

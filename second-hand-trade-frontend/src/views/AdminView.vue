@@ -126,6 +126,12 @@
                       @click="handleDispute(dispute.id)"
                       >处理</el-button
                     >
+                    <el-button
+                      v-if="dispute.status === 'processing'"
+                      type="success"
+                      @click="resolveDispute(dispute.id)"
+                      >标记为已解决</el-button
+                    >
                   </div>
                 </div>
               </el-card>
@@ -225,6 +231,19 @@ const handleDispute = async (disputeId: number) => {
   } catch (error) {
     console.error("处理纠纷失败:", error);
     ElMessage.error("处理失败，请稍后重试");
+  }
+};
+
+const resolveDispute = async (disputeId: number) => {
+  try {
+    await api.put(`/admin/disputes/${disputeId}/status`, {
+      status: "resolved",
+    });
+    ElMessage.success("纠纷已解决");
+    await fetchDisputes();
+  } catch (error) {
+    console.error("解决纠纷失败:", error);
+    ElMessage.error("操作失败，请稍后重试");
   }
 };
 

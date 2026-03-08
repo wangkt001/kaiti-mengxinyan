@@ -28,4 +28,8 @@ public class Dispute implements Serializable {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    private String orderNumber;
+
+    private String userName;
 }
