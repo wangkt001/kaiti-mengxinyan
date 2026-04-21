@@ -12,7 +12,6 @@ Thumbs.db
 # Build files
 build/
 dist/
-target/
 
 # Node.js dependencies
 node_modules/
