@@ -26,7 +26,7 @@ public interface UserDao {
     @Insert("INSERT INTO users (username, password, real_name, id_number, phone, email, role, created_at, updated_at) VALUES (#{username}, #{password}, #{realName}, #{idNumber}, #{phone}, #{email}, #{role}, #{createdAt}, #{updatedAt})")
     void insert(User user);
 
-    @Update("UPDATE users SET real_name = #{realName}, password = #{password}, id_number = #{idNumber}, phone = #{phone}, email = #{email}, role = #{role}, updated_at = #{updatedAt} WHERE id = #{id}")
+    @Update("UPDATE users SET real_name = #{realName}, password = #{password}, id_number = #{idNumber}, phone = #{phone}, email = #{email}, role = #{role}, avatar = #{avatar}, updated_at = #{updatedAt} WHERE id = #{id}")
     void update(User user);
 
     @Delete("DELETE FROM users WHERE id = #{id}")

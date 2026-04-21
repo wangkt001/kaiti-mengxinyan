@@ -14,6 +14,18 @@
               alt=""
               class="avatar"
             />
+            <el-upload
+              class="avatar-uploader"
+              action=""
+              :show-file-list="false"
+              :auto-upload="false"
+              :on-change="handleAvatarChange"
+              accept="image/*"
+            >
+              <el-button type="primary" size="small" class="upload-btn"
+                >更换头像</el-button
+              >
+            </el-upload>
           </div>
           <div class="user-details">
             <p>
@@ -200,6 +212,18 @@ const submitEdit = async () => {
   }
 };
 
+const handleAvatarChange = async (file: any) => {
+  try {
+    const res = await userApi.uploadAvatar(file.raw);
+    ElMessage.success("头像上传成功");
+    user.value.avatar = res.avatar;
+    userStore.setUser(user.value);
+  } catch (error) {
+    console.error("头像上传失败:", error);
+    ElMessage.error("头像上传失败，请稍后重试");
+  }
+};
+
 const editGoods = (goodsId: number) => {
   router.push(`/goods/edit/${goodsId}`);
 };
@@ -286,12 +310,22 @@ onMounted(async () => {
 
         .user-avatar {
           margin-right: 30px;
+          position: relative;
 
           .avatar {
             width: 120px;
             height: 120px;
             border-radius: 50%;
             object-fit: cover;
+          }
+
+          .avatar-uploader {
+            margin-top: 10px;
+            text-align: center;
+
+            .upload-btn {
+              width: 100%;
+            }
           }
         }
 

@@ -4,6 +4,11 @@ import com.campus.secondhand.model.User;
 import com.campus.secondhand.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -78,5 +83,29 @@ public class UserController {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @PostMapping("/upload-avatar")
+    public Map<String, Object> uploadAvatar(@RequestParam("file") MultipartFile file,
+            @RequestHeader("X-User-Id") Integer userId)
+            throws IOException {
+        System.out.println("接收到头像上传请求");
+        System.out.println("用户ID: " + userId);
+        System.out.println("文件名: " + file.getOriginalFilename());
+        System.out.println("文件大小: " + file.getSize());
+
+        byte[] bytes = file.getBytes();
+        String base64Data = java.util.Base64.getEncoder().encodeToString(bytes);
+        String avatarData = "data:image/" + file.getContentType().split("/")[1] + ";base64," + base64Data;
+
+        User user = userService.getById(userId);
+        if (user != null) {
+            user.setAvatar(avatarData);
+            userService.updateById(user);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("avatar", avatarData);
+        return result;
     }
 }

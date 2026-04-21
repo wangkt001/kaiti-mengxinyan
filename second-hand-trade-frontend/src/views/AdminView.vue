@@ -12,20 +12,27 @@
             <div class="users-list">
               <el-card v-for="user in users" :key="user.id" class="user-item">
                 <div class="user-info">
-                  <h4>{{ user.username }}</h4>
-                  <p>
-                    角色:
-                    {{
-                      user.role === "student"
-                        ? "学生"
-                        : user.role === "teacher"
-                        ? "教师"
-                        : "管理员"
-                    }}
-                  </p>
-                  <p>学号/工号: {{ user.idNumber }}</p>
-                  <p>邮箱: {{ user.email }}</p>
-                  <p>手机号: {{ user.phone }}</p>
+                  <img
+                    :src="user.avatar || 'https://picsum.photos/60/60?random=1'"
+                    alt=""
+                    class="user-avatar"
+                  />
+                  <div class="user-detail">
+                    <h4>{{ user.username }}</h4>
+                    <p>
+                      角色:
+                      {{
+                        user.role === "student"
+                          ? "学生"
+                          : user.role === "teacher"
+                          ? "教师"
+                          : "管理员"
+                      }}
+                    </p>
+                    <p>学号/工号: {{ user.idNumber }}</p>
+                    <p>邮箱: {{ user.email }}</p>
+                    <p>手机号: {{ user.phone }}</p>
+                  </div>
                   <div class="user-actions">
                     <el-button type="primary" @click="openEditDialog(user)"
                       >编辑</el-button
@@ -378,13 +385,30 @@ onMounted(async () => {
           margin-bottom: 15px;
 
           .user-info {
-            p {
-              margin-bottom: 5px;
-              color: #666;
+            display: flex;
+            align-items: center;
+
+            .user-avatar {
+              width: 60px;
+              height: 60px;
+              border-radius: 50%;
+              object-fit: cover;
+              margin-right: 20px;
+              flex-shrink: 0;
+            }
+
+            .user-detail {
+              flex: 1;
+
+              p {
+                margin-bottom: 5px;
+                color: #666;
+              }
             }
 
             .user-actions {
-              margin-top: 15px;
+              margin-left: 20px;
+              flex-shrink: 0;
 
               .el-button {
                 margin-right: 10px;

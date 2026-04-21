@@ -32,7 +32,7 @@
       <div class="seller-info">
         <h3>卖家信息</h3>
         <div class="seller-details">
-          <img :src="seller?.avatar || ''" alt="" class="seller-avatar" />
+          <img :src="seller?.avatar || 'https://picsum.photos/80/80?random=1'" alt="" class="seller-avatar" />
           <div class="seller-info-text">
             <p>{{ seller?.role === "student" ? "学生" : "教师" }}</p>
             <p>{{ seller?.phone }}</p>

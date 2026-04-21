@@ -19,4 +19,13 @@ export const userApi = {
   update: (user) => {
     return api.put("/user/update", user);
   },
+  uploadAvatar: (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return api.post("/user/upload-avatar", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
 };
