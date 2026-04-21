@@ -17,18 +17,21 @@
           </div>
           <div class="user-details">
             <p>
-              {{ 
-                user?.role === "student" 
+              {{
+                user?.role === "student"
                   ? "学生"
                   : user?.role === "teacher"
                   ? "教师"
                   : "管理员"
               }}
             </p>
-            <p>{{ user?.idNumber }}</p>
-            <p>{{ user?.email }}</p>
-            <p>{{ user?.phone }}</p>
-            <el-button type="primary" @click="editInfo">编辑信息</el-button>
+            <p>姓名: {{ user?.realName || "-" }}</p>
+            <p>学号/工号: {{ user?.idNumber }}</p>
+            <p>邮箱: {{ user?.email }}</p>
+            <p>手机号: {{ user?.phone }}</p>
+            <el-button type="primary" @click="openEditDialog"
+              >编辑信息</el-button
+            >
           </div>
         </div>
 
@@ -111,6 +114,28 @@
         </div>
       </div>
     </el-card>
+
+    <!-- 个人信息编辑弹窗 -->
+    <el-dialog v-model="editDialogVisible" title="编辑个人信息" width="500px">
+      <el-form :model="editForm" label-width="80px">
+        <el-form-item label="用户名">
+          <el-input v-model="editForm.username" disabled />
+        </el-form-item>
+        <el-form-item label="真实姓名">
+          <el-input v-model="editForm.realName" />
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="editForm.email" />
+        </el-form-item>
+        <el-form-item label="手机号">
+          <el-input v-model="editForm.phone" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="editDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitEdit">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -130,6 +155,14 @@ const activeTab = ref("published");
 const publishedGoods = ref([]);
 const purchasedOrders = ref([]);
 const evaluations = ref([]);
+const editDialogVisible = ref(false);
+const editForm = ref({
+  id: null,
+  username: "",
+  realName: "",
+  email: "",
+  phone: "",
+});
 
 const getOrderStatusText = (status: string) => {
   const statusMap = {
@@ -143,8 +176,28 @@ const getOrderStatusText = (status: string) => {
   return statusMap[status] || status;
 };
 
-const editInfo = () => {
-  // 编辑个人信息逻辑
+const openEditDialog = () => {
+  editForm.value = {
+    id: user.value.id,
+    username: user.value.username,
+    realName: user.value.realName || "",
+    email: user.value.email || "",
+    phone: user.value.phone || "",
+  };
+  editDialogVisible.value = true;
+};
+
+const submitEdit = async () => {
+  try {
+    await userApi.update(editForm.value);
+    ElMessage.success("修改成功");
+    editDialogVisible.value = false;
+    await fetchUserInfo();
+    userStore.setUser(user.value);
+  } catch (error) {
+    console.error("编辑信息失败:", error);
+    ElMessage.error("编辑失败，请稍后重试");
+  }
 };
 
 const editGoods = (goodsId: number) => {

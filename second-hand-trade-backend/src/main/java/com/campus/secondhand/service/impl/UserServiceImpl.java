@@ -101,6 +101,7 @@ public class UserServiceImpl implements UserService {
             if (user.getAvatar() != null) {
                 existingUser.setAvatar(user.getAvatar());
             }
+            existingUser.setUpdatedAt(java.time.LocalDateTime.now());
             userDao.update(existingUser);
         }
     }

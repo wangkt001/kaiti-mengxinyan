@@ -27,7 +27,7 @@
                   <p>邮箱: {{ user.email }}</p>
                   <p>手机号: {{ user.phone }}</p>
                   <div class="user-actions">
-                    <el-button type="primary" @click="editUser(user.id)"
+                    <el-button type="primary" @click="openEditDialog(user)"
                       >编辑</el-button
                     >
                     <el-button type="danger" @click="deleteUser(user.id)"
@@ -140,6 +140,35 @@
         </el-tabs>
       </div>
     </el-card>
+
+    <!-- 用户编辑弹窗 -->
+    <el-dialog v-model="editDialogVisible" title="编辑用户" width="500px">
+      <el-form :model="editForm" label-width="80px">
+        <el-form-item label="用户名">
+          <el-input v-model="editForm.username" disabled />
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-select v-model="editForm.role">
+            <el-option label="学生" value="student" />
+            <el-option label="教师" value="teacher" />
+            <el-option label="管理员" value="admin" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="学号/工号">
+          <el-input v-model="editForm.idNumber" />
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="editForm.email" />
+        </el-form-item>
+        <el-form-item label="手机号">
+          <el-input v-model="editForm.phone" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="editDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitEdit">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -158,6 +187,15 @@ const users = ref([]);
 const goodsList = ref([]);
 const orders = ref([]);
 const disputes = ref([]);
+const editDialogVisible = ref(false);
+const editForm = ref({
+  id: null,
+  username: "",
+  role: "",
+  idNumber: "",
+  email: "",
+  phone: "",
+});
 
 const getOrderStatusText = (status: string) => {
   const statusMap = {
@@ -171,9 +209,28 @@ const getOrderStatusText = (status: string) => {
   return statusMap[status] || status;
 };
 
-const editUser = (userId: number) => {
-  // 编辑用户逻辑
-  ElMessage.info("编辑用户功能待实现");
+const openEditDialog = (user) => {
+  editForm.value = {
+    id: user.id,
+    username: user.username,
+    role: user.role,
+    idNumber: user.idNumber,
+    email: user.email,
+    phone: user.phone,
+  };
+  editDialogVisible.value = true;
+};
+
+const submitEdit = async () => {
+  try {
+    await api.put(`/admin/users/${editForm.value.id}`, editForm.value);
+    ElMessage.success("修改成功");
+    editDialogVisible.value = false;
+    await fetchUsers();
+  } catch (error) {
+    console.error("编辑用户失败:", error);
+    ElMessage.error("编辑失败，请稍后重试");
+  }
 };
 
 const deleteUser = async (userId: number) => {
