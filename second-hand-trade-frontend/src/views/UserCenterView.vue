@@ -57,34 +57,38 @@
                   class="goods-card"
                 >
                   <img
-                    :src="goods.images[0]?.imagePath || ''"
+                    :src="goods.images?.[0]?.imageData || ''"
                     alt=""
                     class="goods-image"
                   />
                   <div class="goods-info">
                     <h4>{{ goods.name }}</h4>
                     <p class="goods-price">¥{{ goods.price }}</p>
-                    <p class="goods-status">
-                      {{
-                        goods.status === "active"
-                          ? "在售"
-                          : goods.status === "sold"
-                          ? "已售出"
-                          : "已过期"
-                      }}
-                    </p>
-                    <el-button
-                      type="primary"
-                      size="small"
-                      @click="editGoods(goods.id)"
-                      >编辑</el-button
-                    >
-                    <el-button
-                      type="danger"
-                      size="small"
-                      @click="deleteGoods(goods.id)"
-                      >删除</el-button
-                    >
+                    <div class="goods-meta">
+                      <span class="goods-status">
+                        {{
+                          goods.status === "active"
+                            ? "在售"
+                            : goods.status === "sold"
+                            ? "已售出"
+                            : "已过期"
+                        }}
+                      </span>
+                      <div class="goods-actions">
+                        <el-button
+                          type="primary"
+                          size="small"
+                          @click="editGoods(goods.id)"
+                          >编辑</el-button
+                        >
+                        <el-button
+                          type="danger"
+                          size="small"
+                          @click="deleteGoods(goods.id)"
+                          >删除</el-button
+                        >
+                      </div>
+                    </div>
                   </div>
                 </el-card>
               </div>
@@ -354,48 +358,53 @@ onMounted(async () => {
           gap: 20px;
 
           .goods-card {
-            height: 250px;
             display: flex;
             flex-direction: column;
 
             .goods-image {
               width: 100%;
-              height: 150px;
+              height: 100px;
               object-fit: cover;
-              margin-bottom: 10px;
+              margin-bottom: 8px;
             }
 
             .goods-info {
-              flex: 1;
-              display: flex;
-              flex-direction: column;
-              justify-content: space-between;
-
               h4 {
-                font-size: 14px;
-                margin-bottom: 5px;
+                font-size: 13px;
+                margin-bottom: 4px;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 display: -webkit-box;
-                -webkit-line-clamp: 2;
+                -webkit-line-clamp: 1;
                 -webkit-box-orient: vertical;
               }
 
               .goods-price {
-                font-size: 16px;
+                font-size: 15px;
                 color: #f56c6c;
                 font-weight: bold;
-                margin-bottom: 5px;
+                margin-bottom: 8px;
               }
 
-              .goods-status {
-                font-size: 12px;
-                color: #999;
-                margin-bottom: 10px;
-              }
+              .goods-meta {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
 
-              .el-button {
-                margin-right: 5px;
+                .goods-status {
+                  font-size: 12px;
+                  color: #999;
+                }
+
+                .goods-actions {
+                  display: flex;
+                  gap: 5px;
+
+                  .el-button {
+                    padding: 4px 10px;
+                    font-size: 12px;
+                  }
+                }
               }
             }
           }
