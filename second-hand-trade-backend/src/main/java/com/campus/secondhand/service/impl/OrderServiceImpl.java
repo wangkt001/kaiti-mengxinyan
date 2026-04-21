@@ -1,19 +1,23 @@
 package com.campus.secondhand.service.impl;
 
 import com.campus.secondhand.dao.OrderDao;
+import com.campus.secondhand.dao.GoodsDao;
 import com.campus.secondhand.model.Order;
+import com.campus.secondhand.model.Goods;
 import com.campus.secondhand.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderDao orderDao;
+
+    @Autowired
+    private GoodsDao goodsDao;
 
     @Override
     public List<Order> listByBuyer(Integer buyerId) {
@@ -42,7 +46,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order createOrder(Order order) {
-        // 生成订单号：时间戳 + 两位随机数
+        Goods goods = goodsDao.getById(order.getGoodsId());
+        if (goods == null) {
+            throw new RuntimeException("商品不存在");
+        }
+        if (goods.getStock() < order.getQuantity()) {
+            throw new RuntimeException("库存不足");
+        }
+
         String timestamp = String.valueOf(System.currentTimeMillis());
         int random = (int) (Math.random() * 100);
         String orderNumber = timestamp + String.format("%02d", random);
@@ -52,6 +63,16 @@ public class OrderServiceImpl implements OrderService {
         order.setCreatedAt(java.time.LocalDateTime.now());
         order.setUpdatedAt(java.time.LocalDateTime.now());
         orderDao.insert(order);
+
+        int newStock = goods.getStock() - order.getQuantity();
+        goods.setStock(newStock);
+        if (newStock <= 0) {
+            goods.setStock(0);
+            goods.setStatus("sold");
+        }
+        goods.setUpdatedAt(java.time.LocalDateTime.now());
+        goodsDao.update(goods);
+
         return order;
     }
 

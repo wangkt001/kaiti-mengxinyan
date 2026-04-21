@@ -16,14 +16,24 @@
         <div class="goods-info">
           <h2>{{ goods.name }}</h2>
           <p class="goods-price">¥{{ goods.price }}</p>
-          <p class="goods-stock">库存: {{ goods.stock }}件</p>
+          <p class="goods-stock" :class="{ 'stock-empty': goods.stock <= 0 }">
+            库存: {{ goods.stock > 0 ? goods.stock + "件" : "已售罄" }}
+          </p>
           <p class="goods-category">分类: {{ goods.categoryName }}</p>
           <p class="goods-description">{{ goods.description }}</p>
           <div class="goods-actions">
-            <el-button type="primary" size="large" @click="addToCart"
+            <el-button
+              type="primary"
+              size="large"
+              @click="addToCart"
+              :disabled="goods.stock <= 0"
               >加入购物车</el-button
             >
-            <el-button type="success" size="large" @click="buyNow"
+            <el-button
+              type="success"
+              size="large"
+              @click="buyNow"
+              :disabled="goods.stock <= 0"
               >立即购买</el-button
             >
           </div>
@@ -32,7 +42,11 @@
       <div class="seller-info">
         <h3>卖家信息</h3>
         <div class="seller-details">
-          <img :src="seller?.avatar || 'https://picsum.photos/80/80?random=1'" alt="" class="seller-avatar" />
+          <img
+            :src="seller?.avatar || 'https://picsum.photos/80/80?random=1'"
+            alt=""
+            class="seller-avatar"
+          />
           <div class="seller-info-text">
             <p>{{ seller?.role === "student" ? "学生" : "教师" }}</p>
             <p>{{ seller?.phone }}</p>
@@ -91,6 +105,10 @@ const fetchSellerInfo = async (userId: number) => {
 
 const addToCart = () => {
   if (!goods.value) return;
+  if (goods.value.stock <= 0) {
+    ElMessage.warning("商品已售罄");
+    return;
+  }
 
   cartStore.addToCart(goods.value);
   ElMessage.success("已加入购物车");
@@ -100,6 +118,11 @@ const buyNow = async () => {
   if (!userStore.isLoggedIn) {
     ElMessage.error("请先登录");
     router.push("/login");
+    return;
+  }
+
+  if (goods.value && goods.value.stock <= 0) {
+    ElMessage.warning("商品已售罄，无法购买");
     return;
   }
 
@@ -164,6 +187,11 @@ onMounted(() => {
         .goods-stock {
           margin-bottom: 10px;
           color: #666;
+
+          &.stock-empty {
+            color: #f56c6c;
+            font-weight: bold;
+          }
         }
 
         .goods-category {
