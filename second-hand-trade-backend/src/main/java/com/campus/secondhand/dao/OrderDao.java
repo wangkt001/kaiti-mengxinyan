@@ -1,6 +1,7 @@
 package com.campus.secondhand.dao;
 
 import com.campus.secondhand.model.Order;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -27,4 +28,7 @@ public interface OrderDao {
 
     @Update("UPDATE orders SET status = #{status}, updated_at = #{updatedAt} WHERE id = #{id}")
     void update(Order order);
+
+    @Delete("DELETE FROM orders WHERE goods_id = #{goodsId}")
+    void deleteByGoodsId(Integer goodsId);
 }

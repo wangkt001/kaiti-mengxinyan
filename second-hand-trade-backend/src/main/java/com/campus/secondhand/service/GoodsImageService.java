@@ -12,4 +12,6 @@ public interface GoodsImageService {
     void save(GoodsImage goodsImage);
 
     void removeById(Integer id);
+
+    void deleteByGoodsId(Integer goodsId);
 }

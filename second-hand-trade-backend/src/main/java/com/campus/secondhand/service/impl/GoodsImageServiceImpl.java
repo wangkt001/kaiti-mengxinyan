@@ -33,4 +33,9 @@ public class GoodsImageServiceImpl implements GoodsImageService {
     public void removeById(Integer id) {
         goodsImageDao.delete(id);
     }
+
+    @Override
+    public void deleteByGoodsId(Integer goodsId) {
+        goodsImageDao.delete(goodsId);
+    }
 }

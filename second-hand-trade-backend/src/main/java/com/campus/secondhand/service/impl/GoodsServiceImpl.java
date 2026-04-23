@@ -3,6 +3,8 @@ package com.campus.secondhand.service.impl;
 import com.campus.secondhand.dao.GoodsDao;
 import com.campus.secondhand.model.Goods;
 import com.campus.secondhand.service.GoodsService;
+import com.campus.secondhand.service.GoodsImageService;
+import com.campus.secondhand.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,12 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Autowired
     private GoodsDao goodsDao;
+
+    @Autowired
+    private GoodsImageService goodsImageService;
+
+    @Autowired
+    private OrderService orderService;
 
     @Override
     public List<Goods> list() {
@@ -56,12 +64,26 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Override
     public void updateById(Goods goods) {
+        Goods existingGoods = goodsDao.getById(goods.getId());
+        if (existingGoods != null) {
+            if (goods.getStatus() == null) {
+                goods.setStatus(existingGoods.getStatus());
+            }
+            if (goods.getUpdatedAt() == null) {
+                goods.setUpdatedAt(java.time.LocalDateTime.now());
+            }
+        }
         goodsDao.update(goods);
     }
 
     @Override
     public void removeById(Integer id) {
-        goodsDao.delete(id);
+        Goods goods = goodsDao.getById(id);
+        if (goods != null) {
+            goods.setStatus("deleted");
+            goods.setUpdatedAt(java.time.LocalDateTime.now());
+            goodsDao.update(goods);
+        }
     }
 
     @Override

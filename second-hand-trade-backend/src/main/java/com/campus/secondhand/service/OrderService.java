@@ -20,4 +20,6 @@ public interface OrderService {
     void updateOrderStatus(Integer orderId, String status);
 
     List<Order> listAll();
+
+    void deleteByGoodsId(Integer goodsId);
 }

@@ -28,7 +28,7 @@ public interface GoodsDao {
     @Select("SELECT id, name, description, price, stock, category_id as categoryId, user_id as userId, status, created_at as createdAt, updated_at as updatedAt FROM goods WHERE category_id = #{categoryId} AND status = 'active'")
     List<Goods> listByCategory(Integer categoryId);
 
-    @Select("SELECT id, name, description, price, stock, category_id as categoryId, user_id as userId, status, created_at as createdAt, updated_at as updatedAt FROM goods WHERE user_id = #{userId}")
+    @Select("SELECT id, name, description, price, stock, category_id as categoryId, user_id as userId, status, created_at as createdAt, updated_at as updatedAt FROM goods WHERE user_id = #{userId} AND status != 'deleted'")
     List<Goods> listByUser(Integer userId);
 
     @Select("SELECT id, name, description, price, stock, category_id as categoryId, user_id as userId, status, created_at as createdAt, updated_at as updatedAt FROM goods WHERE name LIKE CONCAT('%', #{keyword}, '%') AND status = 'active'")

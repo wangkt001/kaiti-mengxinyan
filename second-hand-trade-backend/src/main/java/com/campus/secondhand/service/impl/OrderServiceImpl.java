@@ -89,4 +89,9 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> listAll() {
         return orderDao.listAll();
     }
+
+    @Override
+    public void deleteByGoodsId(Integer goodsId) {
+        orderDao.deleteByGoodsId(goodsId);
+    }
 }
