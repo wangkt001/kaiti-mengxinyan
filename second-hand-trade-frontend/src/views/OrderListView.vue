@@ -16,30 +16,37 @@
                 class="order-item"
               >
                 <div class="order-info">
-                  <h4>订单号: {{ order.orderNumber }}</h4>
-                  <p>商品: {{ order.goodsName }}</p>
-                  <p>价格: ¥{{ order.totalPrice }}</p>
-                  <p v-if="order.address">收货地址: {{ order.address }}</p>
-                  <p>
-                    状态:
-                    <el-tag :type="getStatusTagType(order.status)">{{
-                      getOrderStatusText(order.status)
-                    }}</el-tag>
-                  </p>
-                  <p>下单时间: {{ order.createdAt }}</p>
-                  <div class="order-actions">
-                    <el-button
-                      v-if="order.status === 'shipped'"
-                      type="primary"
-                      @click="confirmReceive(order.id)"
-                      >确认收货</el-button
-                    >
-                    <el-button
-                      v-if="order.status === 'received'"
-                      type="success"
-                      disabled
-                      >交易完成</el-button
-                    >
+                  <img
+                    :src="order.goodsImage || ''"
+                    alt=""
+                    class="order-goods-image"
+                  />
+                  <div class="order-detail">
+                    <h4>订单号: {{ order.orderNumber }}</h4>
+                    <p>商品: {{ order.goodsName }}</p>
+                    <p>价格: ¥{{ order.totalPrice }}</p>
+                    <p v-if="order.address">收货地址: {{ order.address }}</p>
+                    <p>
+                      状态:
+                      <el-tag :type="getStatusTagType(order.status)">{{
+                        getOrderStatusText(order.status)
+                      }}</el-tag>
+                    </p>
+                    <p>下单时间: {{ order.createdAt }}</p>
+                    <div class="order-actions">
+                      <el-button
+                        v-if="order.status === 'shipped'"
+                        type="primary"
+                        @click="confirmReceive(order.id)"
+                        >确认收货</el-button
+                      >
+                      <el-button
+                        v-if="order.status === 'received'"
+                        type="success"
+                        disabled
+                        >交易完成</el-button
+                      >
+                    </div>
                   </div>
                 </div>
               </el-card>
@@ -53,35 +60,42 @@
                 class="order-item"
               >
                 <div class="order-info">
-                  <h4>订单号: {{ order.orderNumber }}</h4>
-                  <p>商品: {{ order.goodsName }}</p>
-                  <p>价格: ¥{{ order.totalPrice }}</p>
-                  <p v-if="order.address">收货地址: {{ order.address }}</p>
-                  <p>
-                    状态:
-                    <el-tag :type="getStatusTagType(order.status)">{{
-                      getOrderStatusText(order.status)
-                    }}</el-tag>
-                  </p>
-                  <p>下单时间: {{ order.createdAt }}</p>
-                  <div class="order-actions">
-                    <el-button
-                      v-if="order.status === 'pending'"
-                      type="primary"
-                      @click="shipOrder(order.id)"
-                      >发货</el-button
-                    >
-                    <el-button
-                      v-if="
-                        order.status === 'shipped' ||
-                        order.status === 'received'
-                      "
-                      type="success"
-                      disabled
-                      >{{
-                        order.status === "shipped" ? "运输中" : "已完成"
-                      }}</el-button
-                    >
+                  <img
+                    :src="order.goodsImage || ''"
+                    alt=""
+                    class="order-goods-image"
+                  />
+                  <div class="order-detail">
+                    <h4>订单号: {{ order.orderNumber }}</h4>
+                    <p>商品: {{ order.goodsName }}</p>
+                    <p>价格: ¥{{ order.totalPrice }}</p>
+                    <p v-if="order.address">收货地址: {{ order.address }}</p>
+                    <p>
+                      状态:
+                      <el-tag :type="getStatusTagType(order.status)">{{
+                        getOrderStatusText(order.status)
+                      }}</el-tag>
+                    </p>
+                    <p>下单时间: {{ order.createdAt }}</p>
+                    <div class="order-actions">
+                      <el-button
+                        v-if="order.status === 'pending'"
+                        type="primary"
+                        @click="shipOrder(order.id)"
+                        >发货</el-button
+                      >
+                      <el-button
+                        v-if="
+                          order.status === 'shipped' ||
+                          order.status === 'received'
+                        "
+                        type="success"
+                        disabled
+                        >{{
+                          order.status === "shipped" ? "运输中" : "已完成"
+                        }}</el-button
+                      >
+                    </div>
                   </div>
                 </div>
               </el-card>
@@ -197,16 +211,32 @@ onMounted(async () => {
           margin-bottom: 15px;
 
           .order-info {
-            p {
-              margin-bottom: 5px;
-              color: #666;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+
+            .order-goods-image {
+              width: 80px;
+              height: 80px;
+              object-fit: cover;
+              border-radius: 6px;
+              flex-shrink: 0;
             }
 
-            .order-actions {
-              margin-top: 15px;
+            .order-detail {
+              flex: 1;
 
-              .el-button {
-                margin-right: 10px;
+              p {
+                margin-bottom: 5px;
+                color: #666;
+              }
+
+              .order-actions {
+                margin-top: 15px;
+
+                .el-button {
+                  margin-right: 10px;
+                }
               }
             }
           }

@@ -101,11 +101,18 @@
                   class="order-card"
                 >
                   <div class="order-info">
-                    <h4>订单号: {{ order.orderNumber }}</h4>
-                    <p>商品: {{ order.goodsName }}</p>
-                    <p>价格: ¥{{ order.totalPrice }}</p>
-                    <p>状态: {{ getOrderStatusText(order.status) }}</p>
-                    <p>下单时间: {{ order.createdAt }}</p>
+                    <img
+                      :src="order.goodsImage || ''"
+                      alt=""
+                      class="order-goods-image"
+                    />
+                    <div class="order-detail">
+                      <h4>订单号: {{ order.orderNumber }}</h4>
+                      <p>商品: {{ order.goodsName }}</p>
+                      <p>价格: ¥{{ order.totalPrice }}</p>
+                      <p>状态: {{ getOrderStatusText(order.status) }}</p>
+                      <p>下单时间: {{ order.createdAt }}</p>
+                    </div>
                   </div>
                 </el-card>
               </div>
@@ -181,13 +188,10 @@ const editForm = ref({
 });
 
 const getOrderStatusText = (status: string) => {
-  const statusMap = {
-    pending: "待支付",
-    payed: "已支付",
-    shipped: "已发货",
+  const statusMap: Record<string, string> = {
+    pending: "待发货",
+    shipped: "运输中",
     received: "已收货",
-    completed: "已完成",
-    cancelled: "已取消",
   };
   return statusMap[status] || status;
 };
@@ -415,9 +419,25 @@ onMounted(async () => {
             margin-bottom: 15px;
 
             .order-info {
-              p {
-                margin-bottom: 5px;
-                color: #666;
+              display: flex;
+              align-items: flex-start;
+              gap: 15px;
+
+              .order-goods-image {
+                width: 80px;
+                height: 80px;
+                object-fit: cover;
+                border-radius: 6px;
+                flex-shrink: 0;
+              }
+
+              .order-detail {
+                flex: 1;
+
+                p {
+                  margin-bottom: 5px;
+                  color: #666;
+                }
               }
             }
           }

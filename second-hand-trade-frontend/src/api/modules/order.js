@@ -14,6 +14,6 @@ export const orderApi = {
     return api.post('/order/create', order)
   },
   updateStatus: (orderId, status) => {
-    return api.put('/order/update-status', { orderId, status })
+    return api.put('/order/update-status', null, { params: { orderId, status } })
   }
 }

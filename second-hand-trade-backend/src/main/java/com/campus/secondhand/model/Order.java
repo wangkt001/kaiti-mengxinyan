@@ -22,6 +22,8 @@ public class Order implements Serializable {
 
     private String goodsName;
 
+    private String goodsImage;
+
     private String buyerName;
 
     private String sellerName;
