@@ -55,6 +55,28 @@
         </div>
       </div>
     </el-card>
+
+    <el-dialog v-model="orderDialogVisible" title="确认订单" width="500px">
+      <el-form :model="orderForm" label-width="80px">
+        <el-form-item label="商品名称">
+          <el-input :value="goods?.name" disabled />
+        </el-form-item>
+        <el-form-item label="商品价格">
+          <el-input :value="'¥' + goods?.price" disabled />
+        </el-form-item>
+        <el-form-item label="收货地址" prop="address">
+          <el-input
+            v-model="orderForm.address"
+            type="textarea"
+            placeholder="请输入收货地址"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="orderDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitOrder">确认下单</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -73,6 +95,10 @@ const userStore = useUserStore();
 const cartStore = useCartStore();
 const goods = ref(null);
 const seller = ref(null);
+const orderDialogVisible = ref(false);
+const orderForm = ref({
+  address: "",
+});
 
 const fetchGoodsDetail = async () => {
   const goodsId = route.params.id;
@@ -114,7 +140,7 @@ const addToCart = () => {
   ElMessage.success("已加入购物车");
 };
 
-const buyNow = async () => {
+const buyNow = () => {
   if (!userStore.isLoggedIn) {
     ElMessage.error("请先登录");
     router.push("/login");
@@ -126,6 +152,16 @@ const buyNow = async () => {
     return;
   }
 
+  orderForm.value.address = "";
+  orderDialogVisible.value = true;
+};
+
+const submitOrder = async () => {
+  if (!orderForm.value.address.trim()) {
+    ElMessage.warning("请输入收货地址");
+    return;
+  }
+
   if (goods.value) {
     try {
       const order = {
@@ -133,8 +169,10 @@ const buyNow = async () => {
         sellerId: goods.value.userId,
         quantity: 1,
         totalPrice: goods.value.price,
+        address: orderForm.value.address,
       };
       await orderApi.create(order);
+      orderDialogVisible.value = false;
       ElMessage.success("订单创建成功");
       router.push("/order/list");
     } catch (error) {

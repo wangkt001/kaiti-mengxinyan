@@ -180,19 +180,8 @@ const totalPrice = computed(() => {
 const shippingFee = ref(0); // 模拟运费
 
 // 收货地址
-const addresses = ref([
-  {
-    name: "张三",
-    phone: "13800138000",
-    detail: "北京市海淀区中关村大街1号"
-  },
-  {
-    name: "李四",
-    phone: "13900139000",
-    detail: "上海市浦东新区张江高科技园区"
-  }
-]);
-const selectedAddress = ref(0);
+const addresses = ref([]);
+const selectedAddress = ref(-1);
 const showAddressForm = ref(false);
 const newAddress = ref({
   name: '',

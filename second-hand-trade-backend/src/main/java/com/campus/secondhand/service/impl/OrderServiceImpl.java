@@ -59,7 +59,7 @@ public class OrderServiceImpl implements OrderService {
         String orderNumber = timestamp + String.format("%02d", random);
         order.setOrderNumber(orderNumber);
 
-        order.setStatus("completed");
+        order.setStatus("pending");
         order.setCreatedAt(java.time.LocalDateTime.now());
         order.setUpdatedAt(java.time.LocalDateTime.now());
         orderDao.insert(order);

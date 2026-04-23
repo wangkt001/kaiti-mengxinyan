@@ -30,6 +30,8 @@ public class Order implements Serializable {
 
     private BigDecimal totalPrice;
 
+    private String address;
+
     private String status;
 
     private LocalDateTime createdAt;
