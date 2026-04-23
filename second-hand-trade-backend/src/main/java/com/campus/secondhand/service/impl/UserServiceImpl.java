@@ -37,6 +37,26 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User register(User user) {
+        if (userDao.getByUsername(user.getUsername()) != null) {
+            throw new RuntimeException("用户名已存在");
+        }
+        if (userDao.getByIdNumber(user.getIdNumber()) != null) {
+            throw new RuntimeException("学号/工号已存在");
+        }
+        List<User> users = userDao.listAll();
+        boolean emailExists = users.stream()
+                .anyMatch(existing -> existing.getEmail() != null && existing.getEmail().equals(user.getEmail()));
+        if (emailExists) {
+            throw new RuntimeException("邮箱已被注册");
+        }
+        boolean phoneExists = users.stream()
+                .anyMatch(existing -> existing.getPhone() != null && existing.getPhone().equals(user.getPhone()));
+        if (phoneExists) {
+            throw new RuntimeException("手机号已被注册");
+        }
+        if (user.getRole() == null || user.getRole().isEmpty()) {
+            user.setRole("student");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         // 设置realName，使用username作为默认值
         if (user.getRealName() == null || user.getRealName().isEmpty()) {
@@ -45,6 +65,7 @@ public class UserServiceImpl implements UserService {
         user.setCreatedAt(java.time.LocalDateTime.now());
         user.setUpdatedAt(java.time.LocalDateTime.now());
         userDao.insert(user);
+        user.setPassword(null);
         return user;
     }
 

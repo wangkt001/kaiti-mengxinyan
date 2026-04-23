@@ -144,7 +144,12 @@ const register = async () => {
           }
         } catch (error) {
           console.error("注册失败:", error);
-          ElMessage.error("注册失败，请稍后重试");
+          ElMessage.error(
+            error.response?.data?.message ||
+              error.response?.data?.detail ||
+              error.response?.data?.error ||
+              "注册失败，请稍后重试",
+          );
         }
       }
     });

@@ -3,6 +3,7 @@ package com.campus.secondhand.controller;
 import com.campus.secondhand.model.User;
 import com.campus.secondhand.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,13 +19,13 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public User register(@RequestBody User user) {
+    public ResponseEntity<?> register(@RequestBody User user) {
         try {
-            return userService.register(user);
+            return ResponseEntity.ok(userService.register(user));
         } catch (Exception e) {
-            System.out.println("Error in register: " + e.getMessage());
-            e.printStackTrace();
-            return null;
+            Map<String, Object> result = new HashMap<>();
+            result.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(result);
         }
     }
 
