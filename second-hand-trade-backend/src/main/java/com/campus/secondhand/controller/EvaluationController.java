@@ -25,8 +25,8 @@ public class EvaluationController {
     }
 
     @PostMapping("/add")
-    public Evaluation add(@RequestBody Evaluation evaluation) {
-        evaluationService.save(evaluation);
+    public Evaluation add(@RequestBody Evaluation evaluation, @RequestHeader("X-User-Id") Integer userId) {
+        evaluationService.save(evaluation, userId);
         return evaluation;
     }
 }

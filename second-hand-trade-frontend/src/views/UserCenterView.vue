@@ -125,7 +125,8 @@
                   class="evaluation-card"
                 >
                   <div class="evaluation-info">
-                    <p>评价对象: {{ evaluation.evaluatedName }}</p>
+                    <p>评价人: {{ evaluation.evaluatorName }}</p>
+                    <p>商品: {{ evaluation.goodsName }}</p>
                     <p>评分: {{ evaluation.rating }}星</p>
                     <p>评价内容: {{ evaluation.comment }}</p>
                     <p>评价时间: {{ evaluation.createdAt }}</p>
@@ -169,6 +170,7 @@ import { ElMessage } from "element-plus";
 import { userApi } from "../api/modules/user";
 import { goodsApi } from "../api/modules/goods";
 import { orderApi } from "../api/modules/order";
+import { evaluationApi } from "../api/modules/evaluation";
 import { useUserStore } from "../store";
 
 const router = useRouter();
@@ -277,7 +279,15 @@ const fetchPurchasedOrders = async () => {
 };
 
 const fetchEvaluations = async () => {
-  // 这里需要实现获取评价记录的API
+  if (!user.value) return;
+  try {
+    const res = await evaluationApi.listByEvaluated(user.value.id);
+    console.log("评价记录:", res);
+    evaluations.value = res || [];
+  } catch (error) {
+    console.error("获取评价记录失败:", error);
+    evaluations.value = [];
+  }
 };
 
 onMounted(async () => {

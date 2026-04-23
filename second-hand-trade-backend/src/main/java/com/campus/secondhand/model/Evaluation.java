@@ -21,5 +21,9 @@ public class Evaluation implements Serializable {
 
     private String comment;
 
+    private String evaluatorName;
+
+    private String goodsName;
+
     private LocalDateTime createdAt;
 }

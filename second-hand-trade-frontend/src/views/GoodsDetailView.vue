@@ -54,6 +54,18 @@
           </div>
         </div>
       </div>
+      <div class="seller-evaluations" v-if="sellerEvaluations.length > 0">
+        <h3>卖家评价</h3>
+        <div
+          v-for="item in sellerEvaluations"
+          :key="item.id"
+          class="evaluation-item"
+        >
+          <el-rate :model-value="item.rating" disabled />
+          <p>{{ item.comment }}</p>
+          <span class="eval-time">{{ item.createdAt }}</span>
+        </div>
+      </div>
     </el-card>
 
     <el-dialog v-model="orderDialogVisible" title="确认订单" width="500px">
@@ -87,6 +99,7 @@ import { ElMessage } from "element-plus";
 import { goodsApi } from "../api/modules/goods";
 import { userApi } from "../api/modules/user";
 import { orderApi } from "../api/modules/order";
+import { evaluationApi } from "../api/modules/evaluation";
 import { useUserStore, useCartStore } from "../store";
 
 const route = useRoute();
@@ -95,6 +108,7 @@ const userStore = useUserStore();
 const cartStore = useCartStore();
 const goods = ref(null);
 const seller = ref(null);
+const sellerEvaluations = ref([]);
 const orderDialogVisible = ref(false);
 const orderForm = ref({
   address: "",
@@ -124,6 +138,8 @@ const fetchSellerInfo = async (userId: number) => {
     const res = await userApi.getUserInfo(userId);
     console.log("卖家信息:", res);
     seller.value = res;
+    const evals = await evaluationApi.listByEvaluated(userId);
+    sellerEvaluations.value = evals;
   } catch (error) {
     console.error("获取卖家信息失败:", error);
   }
@@ -281,6 +297,32 @@ onMounted(() => {
             margin-bottom: 5px;
             color: #666;
           }
+        }
+      }
+    }
+
+    .seller-evaluations {
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+
+      h3 {
+        margin-bottom: 15px;
+        font-size: 18px;
+        color: #333;
+      }
+
+      .evaluation-item {
+        padding: 10px 0;
+        border-bottom: 1px dashed #eee;
+
+        p {
+          margin: 8px 0;
+          color: #666;
+        }
+
+        .eval-time {
+          font-size: 12px;
+          color: #999;
         }
       }
     }

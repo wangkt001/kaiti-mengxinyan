@@ -13,5 +13,5 @@ public interface EvaluationService {
 
     List<Evaluation> findByEvaluatedId(Integer evaluatedId);
 
-    void save(Evaluation evaluation);
+    void save(Evaluation evaluation, Integer userId);
 }

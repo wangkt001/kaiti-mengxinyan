@@ -39,4 +39,6 @@ public class Order implements Serializable {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    private Boolean buyerEvaluated;
 }

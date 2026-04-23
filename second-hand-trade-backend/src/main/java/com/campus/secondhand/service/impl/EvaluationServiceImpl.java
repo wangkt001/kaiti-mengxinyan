@@ -35,7 +35,15 @@ public class EvaluationServiceImpl implements EvaluationService {
     }
 
     @Override
-    public void save(Evaluation evaluation) {
+    public void save(Evaluation evaluation, Integer userId) {
+        evaluation.setEvaluatorId(userId);
+        List<Evaluation> existing = evaluationDao.listByOrder(evaluation.getOrderId());
+        boolean alreadyEvaluated = existing.stream()
+                .anyMatch(e -> e.getEvaluatorId().equals(evaluation.getEvaluatorId()));
+        if (alreadyEvaluated) {
+            throw new RuntimeException("您已经评价过该订单");
+        }
+        evaluation.setCreatedAt(java.time.LocalDateTime.now());
         evaluationDao.insert(evaluation);
     }
 }

@@ -41,10 +41,18 @@
                         >确认收货</el-button
                       >
                       <el-button
-                        v-if="order.status === 'received'"
+                        v-if="order.status === 'received' && !order.buyerEvaluated"
                         type="success"
+                        @click="openEvaluateDialog(order)"
+                        >评价</el-button
+                      >
+                      <el-button
+                        v-if="
+                          order.status === 'received' && order.buyerEvaluated
+                        "
+                        type="info"
                         disabled
-                        >交易完成</el-button
+                        >已评价</el-button
                       >
                     </div>
                   </div>
@@ -104,6 +112,26 @@
         </el-tabs>
       </div>
     </el-card>
+
+    <el-dialog v-model="evaluateDialogVisible" title="评价订单" width="500px">
+      <el-form :model="evaluateForm" label-width="80px">
+        <el-form-item label="评分">
+          <el-rate v-model="evaluateForm.rating" :max="5" />
+        </el-form-item>
+        <el-form-item label="评价内容">
+          <el-input
+            v-model="evaluateForm.comment"
+            type="textarea"
+            rows="4"
+            placeholder="请输入评价内容"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="evaluateDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitEvaluate">提交</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -112,6 +140,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { orderApi } from "../api/modules/order";
+import { evaluationApi } from "../api/modules/evaluation";
 import { useUserStore } from "../store";
 
 const router = useRouter();
@@ -120,6 +149,13 @@ const userStore = useUserStore();
 const activeTab = ref("buyer");
 const buyerOrders = ref([]);
 const sellerOrders = ref([]);
+const evaluateDialogVisible = ref(false);
+const evaluateForm = ref({
+  orderId: 0,
+  evaluatedId: 0,
+  rating: 5,
+  comment: "",
+});
 
 const getOrderStatusText = (status: string) => {
   const statusMap: Record<string, string> = {
@@ -158,6 +194,33 @@ const confirmReceive = async (orderId: number) => {
   } catch (error) {
     console.error("确认收货失败:", error);
     ElMessage.error("确认收货失败，请稍后重试");
+  }
+};
+
+const openEvaluateDialog = async (order: any) => {
+  evaluateForm.value = {
+    orderId: order.id,
+    evaluatedId: order.sellerId,
+    rating: 5,
+    comment: "",
+  };
+  evaluateDialogVisible.value = true;
+};
+
+const submitEvaluate = async () => {
+  try {
+    await evaluationApi.add({
+      orderId: evaluateForm.value.orderId,
+      evaluatedId: evaluateForm.value.evaluatedId,
+      rating: evaluateForm.value.rating,
+      comment: evaluateForm.value.comment,
+    });
+    ElMessage.success("评价成功");
+    evaluateDialogVisible.value = false;
+    fetchBuyerOrders();
+  } catch (error: any) {
+    console.error("评价失败:", error);
+    ElMessage.error(error.response?.data?.message || "评价失败，请稍后重试");
   }
 };
 
