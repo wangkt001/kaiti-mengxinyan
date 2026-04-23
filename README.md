@@ -78,10 +78,12 @@ npm run dev
 
 ### 数据库配置
 
-修改 `second-hand-trade-backend/src/main/resources/application.properties`：
+默认使用的数据库名为 `employment_mengxinyan`，应用首次启动时会自动创建该数据库，并执行 `schema.sql` 完成表结构初始化。
+
+如需修改数据库连接，可调整 `second-hand-trade-backend/src/main/resources/application.properties`：
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/your_database_name
+spring.datasource.url=jdbc:mysql://localhost:3306/your_database_name?createDatabaseIfNotExist=true
 spring.datasource.username=root
 spring.datasource.password=your_password
 ```
