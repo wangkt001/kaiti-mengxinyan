@@ -41,7 +41,9 @@
                         >确认收货</el-button
                       >
                       <el-button
-                        v-if="order.status === 'received' && !order.buyerEvaluated"
+                        v-if="
+                          order.status === 'received' && !order.buyerEvaluated
+                        "
                         type="success"
                         @click="openEvaluateDialog(order)"
                         >评价</el-button
@@ -53,6 +55,22 @@
                         type="info"
                         disabled
                         >已评价</el-button
+                      >
+                      <el-button
+                        v-if="canSubmitDispute(order)"
+                        type="warning"
+                        @click="openDisputeDialog(order)"
+                        >提交纠纷</el-button
+                      >
+                      <el-button
+                        v-else-if="getUserDispute(order.id)"
+                        type="info"
+                        disabled
+                        >{{
+                          getUserDispute(order.id)?.status === "resolved"
+                            ? "已处理"
+                            : "纠纷处理中"
+                        }}</el-button
                       >
                     </div>
                   </div>
@@ -103,10 +121,53 @@
                           order.status === "shipped" ? "运输中" : "已完成"
                         }}</el-button
                       >
+                      <el-button
+                        v-if="canSubmitDispute(order)"
+                        type="warning"
+                        @click="openDisputeDialog(order)"
+                        >提交纠纷</el-button
+                      >
+                      <el-button
+                        v-else-if="getUserDispute(order.id)"
+                        type="info"
+                        disabled
+                        >{{
+                          getUserDispute(order.id)?.status === "resolved"
+                            ? "已处理"
+                            : "纠纷处理中"
+                        }}</el-button
+                      >
                     </div>
                   </div>
                 </div>
               </el-card>
+            </div>
+          </el-tab-pane>
+          <el-tab-pane label="我的纠纷" name="dispute">
+            <div class="orders">
+              <el-card
+                v-for="dispute in disputes"
+                :key="dispute.id"
+                class="order-item"
+              >
+                <div class="order-detail">
+                  <h4>{{ dispute.title }}</h4>
+                  <p>订单号: {{ dispute.orderNumber || dispute.orderId }}</p>
+                  <p>
+                    状态:
+                    <el-tag :type="getDisputeTagType(dispute.status)">{{
+                      getDisputeStatusText(dispute.status)
+                    }}</el-tag>
+                  </p>
+                  <p>问题说明: {{ dispute.description }}</p>
+                  <p>
+                    处理结果:
+                    {{ dispute.resolution || "待管理员处理" }}
+                  </p>
+                  <p>提交时间: {{ dispute.createdAt }}</p>
+                </div>
+              </el-card>
+              <el-empty v-if="!disputes.length" description="暂无纠纷记录" />
             </div>
           </el-tab-pane>
         </el-tabs>
@@ -132,6 +193,30 @@
         <el-button type="primary" @click="submitEvaluate">提交</el-button>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="disputeDialogVisible" title="提交纠纷" width="500px">
+      <el-form :model="disputeForm" label-width="90px">
+        <el-form-item label="纠纷标题">
+          <el-input
+            v-model="disputeForm.title"
+            maxlength="100"
+            placeholder="请输入纠纷标题"
+          />
+        </el-form-item>
+        <el-form-item label="问题说明">
+          <el-input
+            v-model="disputeForm.description"
+            type="textarea"
+            rows="4"
+            placeholder="请填写纠纷说明"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="disputeDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitDispute">提交</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -141,6 +226,7 @@ import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { orderApi } from "../api/modules/order";
 import { evaluationApi } from "../api/modules/evaluation";
+import { disputeApi } from "../api/modules/dispute";
 import { useUserStore } from "../store";
 
 const router = useRouter();
@@ -149,12 +235,19 @@ const userStore = useUserStore();
 const activeTab = ref("buyer");
 const buyerOrders = ref([]);
 const sellerOrders = ref([]);
+const disputes = ref([]);
 const evaluateDialogVisible = ref(false);
+const disputeDialogVisible = ref(false);
 const evaluateForm = ref({
   orderId: 0,
   evaluatedId: 0,
   rating: 5,
   comment: "",
+});
+const disputeForm = ref({
+  orderId: 0,
+  title: "",
+  description: "",
 });
 
 const getOrderStatusText = (status: string) => {
@@ -162,6 +255,7 @@ const getOrderStatusText = (status: string) => {
     pending: "待发货",
     shipped: "运输中",
     received: "已收货",
+    completed: "已完成",
   };
   return statusMap[status] || status;
 };
@@ -171,8 +265,36 @@ const getStatusTagType = (status: string) => {
     pending: "warning",
     shipped: "primary",
     received: "success",
+    completed: "success",
   };
   return typeMap[status] || "info";
+};
+
+const getDisputeStatusText = (status: string) => {
+  const statusMap: Record<string, string> = {
+    pending: "待处理",
+    processing: "处理中",
+    resolved: "已处理",
+  };
+  return statusMap[status] || status;
+};
+
+const getDisputeTagType = (status: string) => {
+  const typeMap: Record<string, string> = {
+    pending: "warning",
+    processing: "primary",
+    resolved: "success",
+  };
+  return typeMap[status] || "info";
+};
+
+const getUserDispute = (orderId: number) => {
+  return disputes.value.find((item: any) => item.orderId === orderId);
+};
+
+const canSubmitDispute = (order: any) => {
+  const allowedStatus = ["shipped", "received", "completed"];
+  return allowedStatus.includes(order.status) && !getUserDispute(order.id);
 };
 
 const shipOrder = async (orderId: number) => {
@@ -207,6 +329,15 @@ const openEvaluateDialog = async (order: any) => {
   evaluateDialogVisible.value = true;
 };
 
+const openDisputeDialog = (order: any) => {
+  disputeForm.value = {
+    orderId: order.id,
+    title: "",
+    description: "",
+  };
+  disputeDialogVisible.value = true;
+};
+
 const submitEvaluate = async () => {
   try {
     await evaluationApi.add({
@@ -221,6 +352,31 @@ const submitEvaluate = async () => {
   } catch (error: any) {
     console.error("评价失败:", error);
     ElMessage.error(error.response?.data?.message || "评价失败，请稍后重试");
+  }
+};
+
+const submitDispute = async () => {
+  if (
+    !disputeForm.value.title.trim() ||
+    !disputeForm.value.description.trim()
+  ) {
+    ElMessage.warning("请完善纠纷标题和问题说明");
+    return;
+  }
+  try {
+    await disputeApi.add({
+      orderId: disputeForm.value.orderId,
+      title: disputeForm.value.title.trim(),
+      description: disputeForm.value.description.trim(),
+    });
+    ElMessage.success("纠纷提交成功");
+    disputeDialogVisible.value = false;
+    await fetchDisputes();
+  } catch (error: any) {
+    console.error("提交纠纷失败:", error);
+    ElMessage.error(
+      error.response?.data?.message || "提交纠纷失败，请稍后重试",
+    );
   }
 };
 
@@ -242,6 +398,16 @@ const fetchSellerOrders = async () => {
   }
 };
 
+const fetchDisputes = async () => {
+  try {
+    const res = await disputeApi.listByUser();
+    disputes.value = res || [];
+  } catch (error) {
+    console.error("获取纠纷记录失败:", error);
+    disputes.value = [];
+  }
+};
+
 onMounted(async () => {
   if (!userStore.isLoggedIn) {
     ElMessage.error("请先登录");
@@ -251,6 +417,7 @@ onMounted(async () => {
 
   await fetchBuyerOrders();
   await fetchSellerOrders();
+  await fetchDisputes();
 });
 </script>
 

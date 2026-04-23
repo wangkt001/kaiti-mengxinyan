@@ -49,6 +49,7 @@ import { useRouter, useRoute } from "vue-router";
 import { ShoppingCart } from "@element-plus/icons-vue";
 import { useUserStore, useCartStore } from "../store/index.js";
 import { userApi } from "../api/modules/user.js";
+import api from "../api/index.js";
 
 const router = useRouter();
 const route = useRoute();
@@ -83,19 +84,32 @@ const goToCart = () => {
   router.push("/cart");
 };
 
-const checkLoginStatus = () => {
+const checkLoginStatus = async () => {
   // 从localStorage中恢复用户信息
   const user = JSON.parse(localStorage.getItem("user"));
   if (user && user.id) {
     userStore.setUser(user);
+    try {
+      const latestUser = await api.get("/user/getById/" + user.id);
+      if (!latestUser) {
+        userStore.logout();
+        return;
+      }
+      userStore.setUser(latestUser);
+      localStorage.setItem("user", JSON.stringify(latestUser));
+    } catch (error) {
+      console.error("同步登录状态失败:", error);
+      userStore.logout();
+      return;
+    }
   }
   // 加载购物车数据
   cartStore.loadCart();
 };
 
-onMounted(() => {
+onMounted(async () => {
   activeIndex.value = route.path;
-  checkLoginStatus();
+  await checkLoginStatus();
 });
 
 // 监听路由变化，更新当前激活的菜单项

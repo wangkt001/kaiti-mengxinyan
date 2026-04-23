@@ -11,6 +11,8 @@ export const disputeApi = {
     return api.post("/dispute/add", dispute);
   },
   resolve: (disputeId, resolution) => {
-    return api.put("/dispute/resolve", { disputeId, resolution });
+    return api.put("/dispute/resolve", null, {
+      params: { disputeId, resolution },
+    });
   },
 };

@@ -126,6 +126,7 @@
                     }}
                   </p>
                   <p>描述: {{ dispute.description }}</p>
+                  <p>处理结果: {{ dispute.resolution || "待填写" }}</p>
                   <div class="dispute-actions">
                     <el-button
                       v-if="dispute.status === 'pending'"
@@ -134,10 +135,10 @@
                       >处理</el-button
                     >
                     <el-button
-                      v-if="dispute.status === 'processing'"
+                      v-if="dispute.status !== 'resolved'"
                       type="success"
-                      @click="resolveDispute(dispute.id)"
-                      >标记为已解决</el-button
+                      @click="openResolveDialog(dispute.id)"
+                      >填写处理结果</el-button
                     >
                   </div>
                 </div>
@@ -176,13 +177,35 @@
         <el-button type="primary" @click="submitEdit">确定</el-button>
       </template>
     </el-dialog>
+
+    <el-dialog
+      v-model="resolveDialogVisible"
+      title="纠纷处理结果"
+      width="500px"
+    >
+      <el-form :model="resolveForm" label-width="90px">
+        <el-form-item label="处理结果">
+          <el-input
+            v-model="resolveForm.resolution"
+            type="textarea"
+            rows="4"
+            placeholder="请输入处理结果"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="resolveDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="resolveDispute">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { ElMessage, ElConfirm } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { disputeApi } from "../api/modules/dispute";
 import { useUserStore } from "../store";
 import api from "../api/index";
 
@@ -195,6 +218,8 @@ const goodsList = ref([]);
 const orders = ref([]);
 const disputes = ref([]);
 const editDialogVisible = ref(false);
+const resolveDialogVisible = ref(false);
+const currentDisputeId = ref<number | null>(null);
 const editForm = ref({
   id: null,
   username: "",
@@ -202,6 +227,9 @@ const editForm = ref({
   idNumber: "",
   email: "",
   phone: "",
+});
+const resolveForm = ref({
+  resolution: "",
 });
 
 const getOrderStatusText = (status: string) => {
@@ -241,13 +269,13 @@ const submitEdit = async () => {
 };
 
 const deleteUser = async (userId: number) => {
-  ElConfirm({
-    title: "确认删除",
-    message: "确定要删除这个用户吗？",
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
-    type: "warning",
-    async confirm() {
+  try {
+    await ElMessageBox.confirm("确定要删除这个用户吗？", "确认删除", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning",
+    });
+    try {
       try {
         await api.delete(`/admin/users/${userId}`);
         ElMessage.success("删除成功");
@@ -256,8 +284,13 @@ const deleteUser = async (userId: number) => {
         console.error("删除用户失败:", error);
         ElMessage.error("删除失败，请稍后重试");
       }
-    },
-  });
+    } catch (error) {
+      console.error("删除用户失败:", error);
+      ElMessage.error("删除失败，请稍后重试");
+    }
+  } catch {
+    // Ignore cancel actions from the confirm dialog.
+  }
 };
 
 const editGoods = (goodsId: number) => {
@@ -266,13 +299,13 @@ const editGoods = (goodsId: number) => {
 };
 
 const deleteGoods = async (goodsId: number) => {
-  ElConfirm({
-    title: "确认删除",
-    message: "确定要删除这个商品吗？",
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
-    type: "warning",
-    async confirm() {
+  try {
+    await ElMessageBox.confirm("确定要删除这个商品吗？", "确认删除", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning",
+    });
+    try {
       try {
         await api.delete(`/admin/goods/${goodsId}`);
         ElMessage.success("删除成功");
@@ -281,8 +314,13 @@ const deleteGoods = async (goodsId: number) => {
         console.error("删除商品失败:", error);
         ElMessage.error("删除失败，请稍后重试");
       }
-    },
-  });
+    } catch (error) {
+      console.error("删除商品失败:", error);
+      ElMessage.error("删除失败，请稍后重试");
+    }
+  } catch {
+    // Ignore cancel actions from the confirm dialog.
+  }
 };
 
 const handleDispute = async (disputeId: number) => {
@@ -298,16 +336,31 @@ const handleDispute = async (disputeId: number) => {
   }
 };
 
-const resolveDispute = async (disputeId: number) => {
+const openResolveDialog = (disputeId: number) => {
+  currentDisputeId.value = disputeId;
+  resolveForm.value.resolution = "";
+  resolveDialogVisible.value = true;
+};
+
+const resolveDispute = async () => {
+  if (!currentDisputeId.value) {
+    return;
+  }
+  if (!resolveForm.value.resolution.trim()) {
+    ElMessage.warning("请输入处理结果");
+    return;
+  }
   try {
-    await api.put(`/admin/disputes/${disputeId}/status`, {
-      status: "resolved",
-    });
+    await disputeApi.resolve(
+      currentDisputeId.value,
+      resolveForm.value.resolution.trim(),
+    );
     ElMessage.success("纠纷已解决");
+    resolveDialogVisible.value = false;
     await fetchDisputes();
-  } catch (error) {
+  } catch (error: any) {
     console.error("解决纠纷失败:", error);
-    ElMessage.error("操作失败，请稍后重试");
+    ElMessage.error(error.response?.data?.message || "操作失败，请稍后重试");
   }
 };
 
